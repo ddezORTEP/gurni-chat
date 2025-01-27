@@ -5,131 +5,125 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gurni Chat</title>
     <style>
-        /* Global Styles */
+        /* Hacker-style terminal look */
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Courier New', Courier, monospace;
             margin: 0;
             padding: 0;
-            background-color: #2c2f33;
+            background-color: #000;
+            color: #0f0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            color: #f1f1f1;
         }
-        
-        /* Chat Container */
+
         .chat-container {
             width: 100%;
-            max-width: 600px;
+            max-width: 800px;
             height: 80vh;
-            background: #23272a;
-            border-radius: 12px;
+            background-color: #000;
+            border: 2px solid #0f0;
+            border-radius: 8px;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
             overflow: hidden;
         }
 
-        /* Header */
         .chat-header {
-            padding: 15px;
-            background-color: #5865f2;
-            color: white;
-            font-size: 20px;
-            text-align: center;
+            padding: 10px;
+            background-color: #000;
+            color: #0f0;
+            font-size: 18px;
             font-weight: bold;
+            border-bottom: 1px solid #0f0;
+            text-align: center;
         }
 
-        /* Messages Section */
         .chat-messages {
             flex: 1;
-            padding: 15px;
+            padding: 10px;
             overflow-y: auto;
-            background-color: #2c2f33;
+            background-color: #000;
         }
 
         .message {
+            margin-bottom: 15px;
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            align-items: flex-start;
+            flex-direction: column;
         }
 
-        .message .avatar {
-            flex-shrink: 0;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: #7289da;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-size: 16px;
+        .message .user {
             font-weight: bold;
+            color: #0f0;
         }
 
-        .message-content {
-            max-width: 80%;
-            padding: 10px;
-            background-color: #36393f;
-            border-radius: 10px;
+        .message .content {
+            padding-left: 10px;
             word-wrap: break-word;
+            color: #0f0;
         }
 
-        .message-content .user {
-            font-size: 14px;
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #7289da;
+        .message img {
+            max-width: 200px;
+            border: 1px solid #0f0;
+            margin-top: 5px;
+            border-radius: 4px;
         }
 
         .reply {
+            font-style: italic;
             font-size: 12px;
-            color: #99aab5;
+            color: #6f6;
             margin-bottom: 5px;
-            border-left: 3px solid #7289da;
-            padding-left: 8px;
         }
 
-        /* Input Section */
+        .reply-button {
+            margin-top: 5px;
+            font-size: 12px;
+            color: #6f6;
+            cursor: pointer;
+            text-decoration: underline;
+            border: none;
+            background: none;
+        }
+
         .chat-input {
             padding: 10px;
-            background: #23272a;
+            background-color: #000;
             display: flex;
-            align-items: center;
             gap: 10px;
-            border-top: 1px solid #444;
+            align-items: center;
+            border-top: 1px solid #0f0;
         }
 
         .chat-input textarea {
             flex: 1;
-            height: 50px;
-            padding: 10px;
+            height: 40px;
+            padding: 5px;
             font-size: 14px;
-            color: #f1f1f1;
-            background: #2c2f33;
-            border: 1px solid #444;
-            border-radius: 8px;
+            background-color: #000;
+            color: #0f0;
+            border: 1px solid #0f0;
+            border-radius: 4px;
             resize: none;
             outline: none;
         }
 
         .chat-input button {
-            padding: 10px 20px;
+            padding: 8px 15px;
             font-size: 14px;
             font-weight: bold;
-            color: white;
-            background-color: #5865f2;
+            color: #000;
+            background-color: #0f0;
             border: none;
-            border-radius: 8px;
+            border-radius: 4px;
             cursor: pointer;
             transition: background-color 0.2s;
         }
 
         .chat-input button:hover {
-            background-color: #4752c4;
+            background-color: #6f6;
         }
 
         .chat-input input[type="file"] {
@@ -138,28 +132,20 @@
 
         .file-label {
             cursor: pointer;
-            background-color: #5865f2;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 8px;
+            background-color: #0f0;
+            color: #000;
+            padding: 8px 12px;
+            border-radius: 4px;
             font-size: 14px;
             transition: background-color 0.2s;
         }
 
         .file-label:hover {
-            background-color: #4752c4;
+            background-color: #6f6;
         }
     </style>
 </head>
 <body>
-    <p>
-    Gurni chat is a 100% anonymous message board, where nothing is saved.
-    <br>It's all open source code, and you can look at anything inside without any problems. 
-    <br>just one rule<br>
-    there are no rules!<br>
-    do whatever you fucking want, idc.
-    <br> file sharing is down, use mediafire or some shit.
-    </p>
     <div class="chat-container">
         <div class="chat-header">Gurni Chat</div>
         <div class="chat-messages" id="chatMessages">
@@ -168,7 +154,7 @@
         <div class="chat-input">
             <textarea id="chatInput" placeholder="Type your message..." onkeydown="handleInput(event)"></textarea>
             <label for="fileInput" class="file-label">Upload</label>
-            <input type="file" id="fileInput" accept="*/*">
+            <input type="file" id="fileInput" accept="image/*">
             <button onclick="sendMessage()">Send</button>
         </div>
     </div>
@@ -177,45 +163,46 @@
         const ws = new WebSocket("ws://localhost:3000");
         let replyToMessage = null;
 
-        function displayMessage(content, type = "user", id = null, user = null, replyTo = null, replyContent = null, isFile = false, filename = null) {
+        function displayMessage(content, user = "System", replyTo = null, isFile = false, filename = null) {
             const chatMessages = document.getElementById("chatMessages");
 
             const messageElement = document.createElement("div");
             messageElement.className = `message`;
 
-            const avatar = document.createElement("div");
-            avatar.className = "avatar";
-            avatar.textContent = user ? `U${user}` : "Sys";
+            const userElement = document.createElement("div");
+            userElement.className = "user";
+            userElement.textContent = `${user}>`;
 
             const contentElement = document.createElement("div");
-            contentElement.className = "message-content";
+            contentElement.className = "content";
 
             if (replyTo) {
                 const replyElement = document.createElement("div");
                 replyElement.className = "reply";
-                replyElement.textContent = `Replying to User ${replyTo.user}: "${replyTo.content}"`;
+                replyElement.textContent = `Replying to ${replyTo.user}: "${replyTo.content}"`;
                 contentElement.appendChild(replyElement);
             }
 
             if (isFile) {
-                const link = document.createElement("a");
-                link.href = content;
-                link.download = filename;
-                link.textContent = `Download ${filename}`;
-                contentElement.appendChild(link);
+                const img = document.createElement("img");
+                img.src = content;
+                img.alt = filename || "Uploaded image";
+                contentElement.appendChild(img);
             } else {
-                const userElement = document.createElement("div");
-                userElement.className = "user";
-                userElement.textContent = `User ${user}`;
-                contentElement.appendChild(userElement);
-
-                const text = document.createElement("div");
-                text.textContent = content;
-                contentElement.appendChild(text);
+                contentElement.textContent += content;
             }
 
-            messageElement.appendChild(avatar);
+            const replyButton = document.createElement("button");
+            replyButton.className = "reply-button";
+            replyButton.textContent = "Reply";
+            replyButton.onclick = () => {
+                replyToMessage = { user, content };
+                document.getElementById("chatInput").placeholder = `Replying to ${user}: "${content}"`;
+            };
+
+            messageElement.appendChild(userElement);
             messageElement.appendChild(contentElement);
+            messageElement.appendChild(replyButton);
 
             chatMessages.appendChild(messageElement);
             chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll to the latest message
@@ -227,12 +214,11 @@
             const message = chatInput.value.trim();
 
             if (message) {
-                const payload = JSON.stringify({ 
-                    type: "user", 
-                    user: userNumber, 
-                    content: message, 
-                    id: Date.now(), 
-                    replyTo: replyToMessage 
+                const payload = JSON.stringify({
+                    type: "user",
+                    user: `User${userNumber}`,
+                    content: message,
+                    replyTo: replyToMessage,
                 });
                 ws.send(payload); // Send the message to the server
                 chatInput.value = "";
@@ -243,20 +229,19 @@
                 const reader = new FileReader();
 
                 reader.onload = () => {
-                    const payload = JSON.stringify({ 
-                        type: "file", 
-                        user: userNumber, 
-                        content: reader.result, 
-                        filename: file.name, 
-                        id: Date.now(), 
-                        replyTo: replyToMessage 
+                    const payload = JSON.stringify({
+                        type: "file",
+                        user: `User${userNumber}`,
+                        content: reader.result,
+                        filename: file.name,
+                        replyTo: replyToMessage,
                     });
                     ws.send(payload);
                 };
                 reader.readAsDataURL(file);
                 fileInput.value = ""; // Reset file input
             } else {
-                alert("Please type a message or select a file before sending.");
+                alert("Please type a message or select an image before sending.");
             }
         }
 
@@ -272,26 +257,11 @@
             const data = JSON.parse(event.data);
 
             if (data.type === "user") {
-                displayMessage(
-                    data.content, 
-                    "user", 
-                    data.id, 
-                    data.user, 
-                    data.replyTo
-                );
+                displayMessage(data.content, data.user, data.replyTo);
             } else if (data.type === "file") {
-                displayMessage(
-                    null, 
-                    "user", 
-                    data.id, 
-                    data.user, 
-                    data.replyTo, 
-                    null, 
-                    true, 
-                    data.filename
-                );
+                displayMessage(data.content, data.user, data.replyTo, true, data.filename);
             } else if (data.type === "system") {
-                displayMessage(data.content, "system");
+                displayMessage(data.content, "System");
             }
         };
 
@@ -301,14 +271,14 @@
 
         ws.onclose = () => {
             console.log("Disconnected from WebSocket server");
-            displayMessage("You have been disconnected from the chat.", "system");
+            displayMessage("You have been disconnected from the chat.", "System");
         };
 
         ws.onerror = (error) => {
             console.error("WebSocket error:", error);
         };
 
-        displayMessage("Welcome to the chat! You are User " + userNumber + ".", "system");
+        displayMessage("Welcome to the chat! You are User" + userNumber, "System");
     </script>
 </body>
 </html>
