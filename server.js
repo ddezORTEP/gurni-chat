@@ -17,9 +17,17 @@ app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
+// Keep track of active connections
+function heartbeat() {
+    this.isAlive = true;
+}
+
 // WebSocket connection handling
 wss.on("connection", (ws) => {
     console.log("A new client connected!");
+
+    ws.isAlive = true;
+    ws.on("pong", heartbeat);
 
     ws.send(JSON.stringify({ type: "system", content: "Welcome to the chat!" }));
 
@@ -62,6 +70,23 @@ wss.on("connection", (ws) => {
     ws.on("error", (error) => {
         console.error("WebSocket error:", error);
     });
+});
+
+// Periodically check for dead connections
+const interval = setInterval(() => {
+    wss.clients.forEach((ws) => {
+        if (!ws.isAlive) {
+            console.log("Terminating dead connection.");
+            return ws.terminate();
+        }
+        ws.isAlive = false;
+        ws.ping();
+    });
+}, 30000); // Run every 30 seconds
+
+// Cleanup interval on server close
+wss.on("close", () => {
+    clearInterval(interval);
 });
 
 // Start the server
