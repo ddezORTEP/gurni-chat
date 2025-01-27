@@ -12,15 +12,15 @@ const PORT = process.env.PORT || 3000; // Use environment variable or default to
 // Serve static files from the "public" directory
 app.use(express.static(path.join(__dirname, "public")));
 
-// Handle root request to serve the chat interface
+// Handle root request to serve the landing page
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// Keep track of active connections
-function heartbeat() {
-    this.isAlive = true;
-}
+// Handle chat page request
+app.get("/chat", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "chat.html"));
+});
 
 // WebSocket connection handling
 wss.on("connection", (ws) => {
@@ -71,6 +71,10 @@ wss.on("connection", (ws) => {
         console.error("WebSocket error:", error);
     });
 });
+
+function heartbeat() {
+    this.isAlive = true;
+}
 
 // Periodically check for dead connections
 const interval = setInterval(() => {

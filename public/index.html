@@ -1,287 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Gurni Chat</title>
-        <style>
-/* Hacker-style terminal look */
-body {
-    font-family: 'Courier New', Courier, monospace;
-    margin: 0;
-    padding: 0;
-    background-color: #000;
-    color: #0f0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gurni Chat - 100% anon</title>
+  <style>
+    /* General Styling */
+    body {
+      background-color: #000; /* Black background for terminal look */
+      color: #0f0; /* Bright green text */
+      font-family: "Courier New", Courier, monospace; /* Retro monospace font */
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
 
-        .chat-container {
-            width: 100%;
-            max-width: 800px;
-            height: 80vh;
-            background-color: #000;
-            border: 2px solid #0f0;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
+    h1 {
+      font-size: 3rem;
+      text-shadow: 0 0 10px #0f0, 0 0 20px #0f0; /* Glowing green text */
+      margin: 0;
+      animation: flicker 2s infinite;
+    }
 
-        .chat-header {
-            padding: 10px;
-            background-color: #000;
-            color: #0f0;
-            font-size: 18px;
-            font-weight: bold;
-            border-bottom: 1px solid #0f0;
-            text-align: center;
-        }
+    p {
+      font-size: 1.2rem;
+      margin: 20px 0;
+      text-align: center;
+    }
 
-        .chat-messages {
-            flex: 1;
-            padding: 10px;
-            overflow-y: auto;
-            background-color: #000;
-        }
+    /* Enter Chat Button */
+    a {
+      color: #0f0; /* Bright green text */
+      text-decoration: none;
+      font-size: 1.5rem;
+      padding: 10px 20px;
+      border: 2px solid #0f0;
+      border-radius: 5px;
+      transition: all 0.3s ease;
+      animation: glow 2s infinite alternate;
+    }
 
-        .message {
-            margin-bottom: 15px;
-            display: flex;
-            flex-direction: column;
-        }
+    a:hover {
+      background-color: #0f0;
+      color: #000;
+    }
 
-        .message .user {
-            font-weight: bold;
-            color: #0f0;
-        }
+    /* Retro Terminal Flicker Effect */
+    @keyframes flicker {
+      0% { opacity: 1; }
+      50% { opacity: 0.9; }
+      100% { opacity: 1; }
+    }
 
-        .message .content {
-            padding-left: 10px;
-            word-wrap: break-word;
-            color: #0f0;
-        }
+    /* Glowing Button Animation */
+    @keyframes glow {
+      0% { box-shadow: 0 0 10px #0f0; }
+      100% { box-shadow: 0 0 20px #0f0; }
+    }
 
-        .message img {
-            max-width: 200px;
-            border: 1px solid #0f0;
-            margin-top: 5px;
-            border-radius: 4px;
-        }
+    /* Scrolling Animation for Text */
+    @keyframes typewriter {
+      from { width: 0; }
+      to { width: 100%; }
+    }
 
-        .reply {
-            font-style: italic;
-            font-size: 12px;
-            color: #6f6;
-            margin-bottom: 5px;
-        }
+    @keyframes blink {
+      50% { border-color: transparent; }
+    }
 
-        .reply-button {
-            margin-top: 5px;
-            font-size: 12px;
-            color: #6f6;
-            cursor: pointer;
-            text-decoration: underline;
-            border: none;
-            background: none;
-        }
+    /* Animated Text Style */
+    .animated-text {
+      font-size: 1.5rem;
+      width: 24ch;
+      white-space: nowrap;
+      overflow: hidden;
+      border-right: 2px solid #0f0;
+      animation: typewriter 4s steps(24, end), blink 0.5s step-end infinite;
+    }
+  </style>
+</head>
+<body>
+  <h1>Gurni Chat</h1>
+  <p class="animated-text">100% anon chat...</p>
 
-        .chat-input {
-            padding: 10px;
-            background-color: #000;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            border-top: 1px solid #0f0;
-        }
+  <p>
+  gurni chat is a completely anonymous chat service with</p> <p class="animated-text"> no rules </p>
+  </p>
+  <a href="/chat">Enter Chat</a>
 
-        .chat-input textarea {
-            flex: 1;
-            height: 40px;
-            padding: 5px;
-            font-size: 14px;
-            background-color: #000;
-            color: #0f0;
-            border: 1px solid #0f0;
-            border-radius: 4px;
-            resize: none;
-            outline: none;
-        }
+  <p> it's maintained by a solo dev, and gives you the power to 
+  <br>
+  say whatever you want, without any consequences</p>
+  <p>Just please, don't be a dick.</p>
+    <a  href="https://github.com/ddezORTEP/gurni-chat">open source code</a>
+<br>
 
-        .chat-input button {
-            padding: 8px 15px;
-            font-size: 14px;
-            font-weight: bold;
-            color: #000;
-            background-color: #0f0;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .chat-input button:hover {
-            background-color: #6f6;
-        }
-
-        .chat-input input[type="file"] {
-            display: none;
-        }
-
-        .file-label {
-            cursor: pointer;
-            background-color: #0f0;
-            color: #000;
-            padding: 8px 12px;
-            border-radius: 4px;
-            font-size: 14px;
-            transition: background-color 0.2s;
-        }
-
-        .file-label:hover {
-            background-color: #6f6;
-        }
-        </style>
-    </head>
-    <body>
-        <div class="chat-container">
-            <div class="chat-header">Gurni Chat</div>
-            <div class="chat-messages" id="chatMessages">
-                <!-- Messages will appear here -->
-            </div>
-            <div class="chat-input">
-                <textarea id="chatInput" placeholder="Type your message..." onkeydown="handleInput(event)"></textarea>
-                <label for="fileInput" class="file-label">Upload</label>
-                <input type="file" id="fileInput" accept="image/*">
-                <button onclick="sendMessage()">Send</button>
-            </div>
-        </div>
-        <script>
-            let userNumber = Math.floor(Math.random() * 1000) + 1;
-            const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
-            const ws = new WebSocket(`${wsProtocol}://${window.location.host}`);
-
-            let replyToMessage = null;
-
-            function displayMessage(content, user = "System", replyTo = null, isFile = false, filename = null) {
-                const chatMessages = document.getElementById("chatMessages");
-
-                const messageElement = document.createElement("div");
-                messageElement.className = `message`;
-
-                const userElement = document.createElement("div");
-                userElement.className = "user";
-                userElement.textContent = `${user}>`;
-
-                const contentElement = document.createElement("div");
-                contentElement.className = "content";
-
-                if (replyTo) {
-                    const replyElement = document.createElement("div");
-                    replyElement.className = "reply";
-                    replyElement.textContent = `Replying to ${replyTo.user}: "${replyTo.content}"`;
-                    contentElement.appendChild(replyElement);
-                }
-
-                if (isFile) {
-                    const img = document.createElement("img");
-                    img.src = content;
-                    img.alt = filename || "Uploaded image";
-                    contentElement.appendChild(img);
-                } else {
-                    contentElement.textContent += content;
-                }
-
-                const replyButton = document.createElement("button");
-                replyButton.className = "reply-button";
-                replyButton.textContent = "Reply";
-                replyButton.onclick = () => {
-                    replyToMessage = { user, content };
-                    document.getElementById("chatInput").placeholder = `Replying to ${user}: "${content}"`;
-                };
-
-                messageElement.appendChild(userElement);
-                messageElement.appendChild(contentElement);
-                messageElement.appendChild(replyButton);
-
-                chatMessages.appendChild(messageElement);
-                chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll to the latest message
-            }
-
-            function sendMessage() {
-                const chatInput = document.getElementById("chatInput");
-                const fileInput = document.getElementById("fileInput");
-                const message = chatInput.value.trim();
-
-                if (message) {
-                    const payload = JSON.stringify({
-                        type: "user",
-                        user: `User${userNumber}`,
-                        content: message,
-                        replyTo: replyToMessage,
-                    });
-                    ws.send(payload); // Send the message to the server
-                    chatInput.value = "";
-                    chatInput.placeholder = "Type your message...";
-                    replyToMessage = null;
-                } else if (fileInput.files.length > 0) {
-                    const file = fileInput.files[0];
-                    const reader = new FileReader();
-
-                    reader.onload = () => {
-                        const payload = JSON.stringify({
-                            type: "file",
-                            user: `User${userNumber}`,
-                            content: reader.result,
-                            filename: file.name,
-                            replyTo: replyToMessage,
-                        });
-                        ws.send(payload);
-                    };
-                    reader.readAsDataURL(file);
-                    fileInput.value = ""; // Reset file input
-                } else {
-                    alert("Please type a message or select an image before sending.");
-                }
-            }
-
-            function handleInput(event) {
-                const chatInput = document.getElementById("chatInput");
-                if (event.key === "Enter" && !event.shiftKey) {
-                    event.preventDefault(); // Prevent default newline behavior
-                    sendMessage(); // Send the message
-                }
-            }
-
-            ws.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-
-                if (data.type === "user") {
-                    displayMessage(data.content, data.user, data.replyTo);
-                } else if (data.type === "file") {
-                    displayMessage(data.content, data.user, data.replyTo, true, data.filename);
-                } else if (data.type === "system") {
-                    displayMessage(data.content, "System");
-                }
-            };
-
-            ws.onopen = () => {
-                console.log("Connected to WebSocket server");
-            };
-
-            ws.onclose = () => {
-                console.log("Disconnected from WebSocket server");
-                displayMessage("You have been disconnected from the chat.", "System");
-            };
-
-            ws.onerror = (error) => {
-                console.error("WebSocket error:", error);
-            };
-
-            displayMessage("Welcome to the chat! You are User" + userNumber, "System");
-        </script>
-    </body>
+</body>
 </html>
 
