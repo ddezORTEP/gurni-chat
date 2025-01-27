@@ -160,7 +160,9 @@
     </div>
     <script>
         let userNumber = Math.floor(Math.random() * 1000) + 1;
-        const ws = new WebSocket("ws://localhost:3000");
+        const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
+const ws = new WebSocket(`${wsProtocol}://${window.location.host}`);
+
         let replyToMessage = null;
 
         function displayMessage(content, user = "System", replyTo = null, isFile = false, filename = null) {
