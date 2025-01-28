@@ -10,28 +10,22 @@
             background-color: #000;
             color: #0f0;
             font-family: "Press Start 2P", monospace;
-            margin: 0;
+            margin: 10;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             overflow: hidden;
-        }
- .crt-wrapper {
-            perspective: 1000px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            width: 100%;
-             
-        }
-      .crt-warper {
-         filter: url(#centerPinch);
-          transform-style: preserve-3d;
-        }
+            flex-direction: column;
+            box-shadow: 0 0 2.5px #0f0, inset 0 0 2.5px #0f0;
 
+        }
+        a{
+            color: #0f0;
+            box-shadow: 0 0 15px #0f0, inset 0 0 10px #0f0;
+
+        }
         .crt {
             position: relative;
             width: 90vw;
@@ -208,7 +202,7 @@
         }
 
         /* Enhanced Input Section Styling */
-        .chat-input {
+       .chat-input {
             display: flex;
             padding: 15px;
             background: #000;
@@ -289,7 +283,6 @@
             text-align: center;
             box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
         }
-
         button:hover, 
         label:hover,
         .reply-button:hover {
@@ -371,17 +364,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="crt-wrapper">
-      <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0" height="0">
-        <defs>
-          <filter id="centerPinch">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur" />
-          <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0, 0 1 0 0 0, 0 0 1 0 0, 0 0 0 -3 3" result="contrast"/>
-            <feDisplacementMap in="SourceGraphic" in2="contrast" xChannelSelector="R" yChannelSelector="G" scale="20" />
-          </filter>
-        </defs>
-      </svg>
-        <div class="crt-warper" >
+    
              <div class="crt">
         <div class="crt-content" id="chatMessages">
             <!-- Messages will appear here -->
@@ -396,8 +379,10 @@
             <button onclick="sendMessage()">Send</button>
         </div>
       </div>
-        </div>
-    </div>
+      <br>
+      <br>
+      <a href=/>back to home</a>
+    
     <script>
         const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
         const ws = new WebSocket(`${wsProtocol}://${window.location.host}`);
