@@ -6,57 +6,105 @@
   <title>Gurni Chat - 100% anon</title>
   <style>
     /* General Styling */
-    body {
-      background-color: #000; /* Black background for terminal look */
-      color: #0f0; /* Bright green text */
-      font-family: "Courier New", Courier, monospace; /* Retro monospace font */
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-    }
+      body {
+            background-color: #000;
+            color: #0f0;
+            font-family: "Press Start 2P", monospace;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            position: relative;
+        }
+    
+        /* Scan lines effect */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 255, 0, 0.15),
+                rgba(0, 255, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            animation: scan 10s linear infinite;
+            z-index: 1;
+        }
 
-    h1 {
-      font-size: 3rem;
-      text-shadow: 0 0 10px #0f0, 0 0 20px #0f0; /* Glowing green text */
-      margin: 0;
-      animation: flicker 2s infinite;
+        /* Screen flicker effect */
+        body::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 255, 0, 0.1);
+            opacity: 0;
+            pointer-events: none;
+            animation: flicker 0.15s infinite;
+            z-index: 1;
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(100%); }
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.1; }
+            50% { opacity: 0; }
+            100% { opacity: 0.1; }
+        }
+    
+     h1 {
+      font-size: 4rem; /* Increased font size */
+      text-shadow: 0 0 5px #0f0, 0 0 5px #0f0, 0 0 30px #0f0 ; /* Enhanced text-shadow */
+      margin: 10px 0 0 0; /* added top margin */
+     position: relative; /* Added position relative */
+    z-index: 9; /* Added z-index */
+       
     }
 
     p {
-      font-size: 1.2rem;
-      margin: 20px 0;
+      font-size: 1rem;
+      margin: 10px 0;
+      text-shadow: 0 0 2.5px #0f0, 0 0 2.5px #0f0, 0 0 30px #0f0 ; /* Enhanced text-shadow */
+
       text-align: center;
     }
-
+    
     /* Enter Chat Button */
     a {
       color: #0f0; /* Bright green text */
       text-decoration: none;
-      font-size: 1.5rem;
-      padding: 10px 20px;
+      font-size: 1.2rem;
+      padding: 10px 15px;
       border: 2px solid #0f0;
       border-radius: 5px;
       transition: all 0.3s ease;
-      animation: glow 2s infinite alternate;
+       animation: glow 2s infinite alternate;
+      text-shadow: 0 0 2.5px #0f0, 0 0 2.5px #0f0, 0 0 30px #0f0 ; /* Enhanced text-shadow */
+
+       margin:5px;
+        display: inline-block;
     }
 
     a:hover {
       background-color: #0f0;
       color: #000;
     }
-
-    /* Retro Terminal Flicker Effect */
-    @keyframes flicker {
-      0% { opacity: 1; }
-      50% { opacity: 0.9; }
-      100% { opacity: 1; }
-    }
-
-    /* Glowing Button Animation */
+    
+      /* Glowing Button Animation */
     @keyframes glow {
       0% { box-shadow: 0 0 10px #0f0; }
       100% { box-shadow: 0 0 20px #0f0; }
@@ -74,7 +122,7 @@
 
     /* Animated Text Style */
     .animated-text {
-      font-size: 1.5rem;
+      font-size: 1.2rem;
       width: 24ch;
       white-space: nowrap;
       overflow: hidden;
@@ -82,6 +130,7 @@
       animation: typewriter 4s steps(24, end), blink 0.5s step-end infinite;
     }
   </style>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
   <h1>Gurni Chat</h1>
@@ -98,7 +147,5 @@
   <p>Just please, don't be a dick.</p>
     <a  href="https://github.com/ddezORTEP/gurni-chat">open source code</a>
 <br>
-
 </body>
 </html>
-

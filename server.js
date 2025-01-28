@@ -7,51 +7,39 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-const PORT = process.env.PORT || 3000; // Use environment variable or default to 3000
+const PORT = process.env.PORT || 3000;
 
 // Serve static files from the "public" directory
 app.use(express.static(path.join(__dirname, "public")));
 
-// Handle root request to serve the landing page
+// Serve the landing page at "/"
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// Handle chat page request
+// Serve the chat page at "/chat"
 app.get("/chat", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "chat.html"));
 });
 
-// WebSocket connection handling
+// WebSocket server logic
 wss.on("connection", (ws) => {
     console.log("A new client connected!");
 
-    ws.isAlive = true;
-    ws.on("pong", heartbeat);
-
-    ws.send(JSON.stringify({ type: "system", content: "Welcome to the chat!" }));
-
     ws.on("message", (message) => {
-        console.log("Received message:", message);
-
         try {
             const parsedMessage = JSON.parse(message);
 
-            // Allow only image uploads and text messages
+            // Handle image uploads
             if (parsedMessage.type === "file") {
-                const isValidImage = parsedMessage.filename.match(/\.(jpg|jpeg|png|gif)$/i);
-                if (!isValidImage) {
-                    ws.send(JSON.stringify({ type: "system", content: "Error: Only image uploads are allowed." }));
+                const base64Regex = /^data:image\/(jpeg|png|gif);base64,/; // Validate JPEG, PNG, GIF
+                if (!base64Regex.test(parsedMessage.content)) {
+                    ws.send(JSON.stringify({ type: "system", content: "Error: Invalid file format. Only JPEG, PNG, and GIF are allowed." }));
                     return;
                 }
             }
 
-            // Check for replies
-            if (parsedMessage.replyTo) {
-                parsedMessage.content = `Replying to User ${parsedMessage.replyTo.user}: "${parsedMessage.replyTo.content}"\n${parsedMessage.content}`;
-            }
-
-            // Broadcast the message to all connected clients
+            // Broadcast messages to all connected clients
             wss.clients.forEach((client) => {
                 if (client.readyState === WebSocket.OPEN) {
                     client.send(JSON.stringify(parsedMessage));
@@ -70,27 +58,6 @@ wss.on("connection", (ws) => {
     ws.on("error", (error) => {
         console.error("WebSocket error:", error);
     });
-});
-
-function heartbeat() {
-    this.isAlive = true;
-}
-
-// Periodically check for dead connections
-const interval = setInterval(() => {
-    wss.clients.forEach((ws) => {
-        if (!ws.isAlive) {
-            console.log("Terminating dead connection.");
-            return ws.terminate();
-        }
-        ws.isAlive = false;
-        ws.ping();
-    });
-}, 30000); // Run every 30 seconds
-
-// Cleanup interval on server close
-wss.on("close", () => {
-    clearInterval(interval);
 });
 
 // Start the server

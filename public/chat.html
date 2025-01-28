@@ -1,325 +1,651 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Gurni Chat</title>
-        <style>
-/* Hacker-style terminal look */
-body {
-    font-family: 'Courier New', Courier, monospace;
-    margin: 0;
-    padding: 0;
-    background-color: #000;
-    color: #0f0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
-
-        .chat-container {
-            width: 100%;
-            max-width: 800px;
-            height: 80vh;
-            background-color: #000;
-            border: 2px solid #0f0;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .chat-header {
-            padding: 10px;
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Chat Terminal</title>
+    <style>
+        /* CRT and Styling */
+        body {
             background-color: #000;
             color: #0f0;
-            font-size: 18px;
-            font-weight: bold;
-            border-bottom: 1px solid #0f0;
-            text-align: center;
+            font-family: "Press Start 2P", monospace;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+ .crt-wrapper {
+            perspective: 1000px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+             
+        }
+      .crt-warper {
+         filter: url(#centerPinch);
+          transform-style: preserve-3d;
         }
 
-        .chat-messages {
+        .crt {
+            position: relative;
+            width: 90vw;
+            height: 90vh;
+            max-width: 800px;
+            max-height: 600px;
+            background-color: #000;
+            border: 5px solid #0f0;
+            overflow: hidden;
+            box-shadow: 0 0 15px #0f0, inset 0 0 10px #0f0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Scan lines effect */
+        .crt::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 255, 0, 0.15),
+                rgba(0, 255, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            animation: scan 10s linear infinite;
+            z-index: 1;
+        }
+
+        /* Screen flicker effect */
+        .crt::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 255, 0, 0.1);
+            opacity: 0;
+            pointer-events: none;
+            animation: flicker 0.15s infinite;
+            z-index: 1;
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(100%); }
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.1; }
+            50% { opacity: 0; }
+            100% { opacity: 0.1; }
+        }
+
+        .crt-content {
             flex: 1;
+            display: flex;
+            flex-direction: column;
             padding: 10px;
             overflow-y: auto;
-            background-color: #000;
+            position: relative;
+            z-index: 2;
         }
 
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 15px;
-  }
-  /* Common message styling */
-  .message {
-      display: flex;
-      flex-direction: column;
-      margin-bottom: 15px;
-  }
+        /* Messages Styling */
+        .message {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
 
-  /* Messages from other users */
-  .message.other {
-      align-items: flex-start;
-  }
+        .message.self {
+            align-items: flex-end;
+        }
 
-  /* Messages from the current user */
-  .message.self {
-      align-items: flex-end;
-  }
+        .message.other {
+            align-items: flex-start;
+        }
 
-  /* Content styling */
-  .content {
-      max-width: 60%;
-      padding: 10px;
-      background-color: #000;
-      color: #0f0;
-      border: 1px solid #0f0;
-      border-radius: 8px;
-      word-wrap: break-word;
-  }
+        .user-meta {
+            font-size: 0.8rem;
+            color: #6f6;
+            margin-bottom: 5px;
+             display: flex; /* Add this to keep user and image indicator on same line */
+             align-items: center;
+        }
 
-  /* Content alignment and styling for self messages */
-  .message.self .content {
-      background-color: #0f0;
-      color: #000;
-      text-align: left;
-      border-radius: 8px 8px 8px 0; /* Rounded bubble for the right */
-      margin: right;
-  }
+       .user-meta .image-indicator {
+    font-size: 0.7rem;
+    margin-left: 5px; /* Space between user name and the image indicator */
+    color: #3f3;
+    }
 
-  /* Content alignment for other messages */
-  .message.other .content {
-      border-radius: 8px 8px 8px 0; /* Rounded bubble for the left */
-  }
+        .content {
+            max-width: 60%;
+            padding: 8px;
+            background-color: #000;
+            color: #0f0;
+            border: 2px solid #0f0;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            word-wrap: break-word;
+            text-shadow: 0 0 5px #0f0;
+             position: relative;
+        }
+         .content.pinged {
+             animation: pingGlow 1s ease-in-out 1; /* Apply ping glow */
+         }
+          @keyframes pingGlow {
+            0% {
+             box-shadow: 0 0 5px #0f0;
+            }
+             50% {
+              box-shadow: 0 0 15px #0f0;
+             }
+              100% {
+              box-shadow: 0 0 5px #0f0;
+             }
+          }
 
-  /* User label styling */
-  .user {
-      font-size: 0.9rem;
-      margin-bottom: 5px;
-  }
+        .message.self .content {
+            background-color: #0f0;
+            color: #000;
+            text-shadow: none;
+        }
 
-  .message.self .user {
-      text-align: left; /* Align the user label to the right */
-  }
+       .reply-container {
+    font-size: 0.8rem;
+    background-color: rgba(0, 255, 0, 0.05); /* Slightly different from background */
+    color: #6f6;
+    padding: 8px;
+    border-left: 3px solid #0f0;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 255, 0, 0.2); /* Subtle glow for contrast */
+}
+ 
+        /* System Messages */
+        .system-message {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #0f0;
+            margin-bottom: 10px;
+            padding: 5px;
+            background: rgba(0, 255, 0, 0.1);
+            border-radius: 4px;
+            animation: glow 1s ease-in-out infinite alternate;
+        }
 
-  /* Reply styling */
-  .reply {
-      font-style: italic;
-      font-size: 0.85rem;
-      margin-bottom: 5px;
-      border-left: 2px solid #6f6;
-      padding-left: 8px;
-      color: #6f6;
-  }
-  .message img {
-      max-width: 200px;
-      border: 1px solid #0f0;
-      margin-top: 5px;
-      border-radius: 4px;
-  }
+        @keyframes glow {
+            from { text-shadow: 0 0 5px #0f0; }
+            to { text-shadow: 0 0 10px #0f0; }
+        }
 
+        /* Images */
+        img {
+            max-width: 200px;
+            margin-top: 10px;
+            border: 2px solid #0f0;
+            border-radius: 5px;
+        }
+      
+    
+       .emoji{
+           display: inline-block;
+           font-size:1.1rem;
+           margin: 0 2px;
+        }
 
-  .reply-button {
-      margin-top: 5px;
-      font-size: 12px;
-      color: #6f6;
-      cursor: pointer;
-      text-decoration: underline;
-      border: none;
-      background: none;
-  }
+        /* Enhanced Input Section Styling */
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            background: #000;
+            border-top: 2px solid #0f0;
+            gap: 10px;
+            position: relative;
+            z-index: 2;
+        }
+    
+    /*  Popup style */
+    .image-upload-indicator {
+        position: absolute;
+        top: -30px; /* Position above input */
+        left: 0;
+        width: 100%;
+        text-align: center;
+        font-size: 0.7rem;
+        color: #0f0;
+        background: rgba(0, 255, 0, 0.1);
+        padding: 4px;
+        border-radius: 4px;
+        opacity: 0;
+        transition: opacity 0.3s ease; /* For smooth appearance */
+        pointer-events: auto;
+        box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+        display: flex; /* Use flexbox */
+        align-items: center; /* Vertically align content */
+        justify-content: center; /* Horizontally align content */
+        cursor: pointer; /* Make it look clickable */
+    }
+     .image-upload-indicator.show {
+        opacity: 1; /* Show the popup */
+    }
 
-  .chat-input {
-      padding: 10px;
-      background-color: #000;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      border-top: 1px solid #0f0;
-  }
+        /* Textarea Styling */
+        textarea {
+            flex: 1;
+            padding: 12px;
+            font-family: "Press Start 2P", monospace;
+            font-size: 0.8rem;
+            background: #000;
+            color: #0f0;
+            border: 2px solid #0f0;
+            border-radius: 4px;
+            resize: none;
+            outline: none;
+            height: 40px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+        }
 
-  .chat-input textarea {
-      flex: 1;
-      height: 40px;
-      padding: 5px;
-      font-size: 14px;
-      background-color: #000;
-      color: #0f0;
-      border: 1px solid #0f0;
-      border-radius: 4px;
-      resize: none;
-      outline: none;
-  }
+        textarea:focus {
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+            border-color: #0f0;
+        }
 
-  .chat-input button {
-      padding: 8px 15px;
-      font-size: 14px;
-      font-weight: bold;
-      color: #000;
-      background-color: #0f0;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.2s;
-  }
+        textarea::placeholder {
+            color: #063;
+        }
 
-  .chat-input button:hover {
-      background-color: #6f6;
-  }
+        /* Button Styling */
+        button, 
+        label,
+        .reply-button {
+            padding: 10px 15px;
+            font-family: "Press Start 2P", monospace;
+            font-size: 0.7rem;
+            color: #0f0;
+            background: #000;
+            border: 2px solid #0f0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            min-width: 80px;
+            text-align: center;
+            box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+        }
 
-  .chat-input input[type="file"] {
-      display: none;
-  }
+        button:hover, 
+        label:hover,
+        .reply-button:hover {
+            background: #0f0;
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
+        }
 
-  .file-label {
-      cursor: pointer;
-      background-color: #0f0;
-      color: #000;
-      padding: 8px 12px;
-      border-radius: 4px;
-      font-size: 14px;
-      transition: background-color 0.2s;
-  }
+        button:active,
+        label:active,
+        .reply-button:active {
+            transform: translateY(2px);
+        }
 
-  .file-label:hover {
-      background-color: #6f6;
-  }
-        </style>
-    </head>
-    <body>
-        <div class="chat-container">
-            <div class="chat-header">Gurni Chat</div>
-            <div class="chat-messages" id="chatMessages">
-                <!-- Messages will appear here -->
-            </div>
-            <div class="chat-input">
-                <textarea id="chatInput" placeholder="Type your message..." onkeydown="handleInput(event)"></textarea>
-                <label for="fileInput" class="file-label">Upload</label>
-                <input type="file" id="fileInput" accept="image/*">
-                <button onclick="sendMessage()">Send</button>
-            </div>
+        /* Special styling for reply button */
+        .reply-button {
+            font-size: 0.6rem;
+            padding: 5px 10px;
+            margin-top: 8px;
+            opacity: 0.7;
+            border-width: 1px;
+            min-width: 60px;
+        }
+
+        .reply-button:hover {
+            opacity: 1;
+        }
+
+        /* Upload button specific styling */
+        label[for="fileInput"] {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        label[for="fileInput"]::before {
+            content: "📁";
+            font-size: 0.8rem;
+        }
+
+        /* Button press effect */
+        button::after,
+        label::after,
+        .reply-button::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(0, 255, 0, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: translate(-50%, -50%);
+            transition: all 0.5s ease;
+        }
+
+        button:focus::after,
+        label:focus::after,
+        .reply-button:focus::after {
+            width: 150%;
+            height: 150%;
+            opacity: 0;
+            transition: all 0s ease;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .chat-input:focus-within {
+            background: linear-gradient(to bottom, 
+                rgba(0, 255, 0, 0.1),
+                rgba(0, 0, 0, 1) 10%
+            );
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="crt-wrapper">
+      <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0" height="0">
+        <defs>
+          <filter id="centerPinch">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur" />
+          <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0, 0 1 0 0 0, 0 0 1 0 0, 0 0 0 -3 3" result="contrast"/>
+            <feDisplacementMap in="SourceGraphic" in2="contrast" xChannelSelector="R" yChannelSelector="G" scale="20" />
+          </filter>
+        </defs>
+      </svg>
+        <div class="crt-warper" >
+             <div class="crt">
+        <div class="crt-content" id="chatMessages">
+            <!-- Messages will appear here -->
         </div>
-        <script>
-            let userNumber = Math.floor(Math.random() * 1000) + 1;
-            const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
-            const ws = new WebSocket(`${wsProtocol}://${window.location.host}`);
+        <div class="chat-input">
+              <div class="image-upload-indicator" id="imageUploadIndicator">
+              Image Uploaded (click here to remove)
+            </div>
+            <textarea id="chatInput" placeholder="Type your message..." onkeydown="handleInput(event)"></textarea>
+            <label for="fileInput">Upload</label>
+            <input type="file" id="fileInput" accept="image/*">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+      </div>
+        </div>
+    </div>
+    <script>
+        const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
+        const ws = new WebSocket(`${wsProtocol}://${window.location.host}`);
+        const userNumber = Math.floor(Math.random() * 1000);
+        let replyToMessage = null;
+        let imageUploadIndicatorTimeout; // Store timeout ID
+         const emojiMap = {
+            ':)': '<span class="emoji">^_^</span>',
+            ':(': '<span class="emoji">o_o</span>',
+            ':D': '<span class="emoji">\\o/</span>',
+            '<3': '<span class="emoji"><3</span>',
+            ':O': '<span class="emoji">O_O</span>',
+            ':P': '<span class="emoji">:-P</span>',
+             ';)': '<span class="emoji">;-)</span>',
+             'XD': '<span class="emoji">XD</span>',
+        };
+        // Send join message when connecting
+        ws.onopen = () => {
+            ws.send(JSON.stringify({
+                type: "system",
+                content: `User${userNumber} has joined the chat`
+            }));
+        };
 
-            let replyToMessage = null;
+ ws.onclose = () => {
+    // Display a local message indicating the user left
+    displaySystemMessage(`You (User${userNumber}) have left the chat`);
 
-function displayMessage(content, user = "System", replyTo = null, isFile = false, filename = null) {
+    // Optionally, inform the user the connection has ended
     const chatMessages = document.getElementById("chatMessages");
+    const warningMessage = document.createElement("div");
+    warningMessage.className = "system-message";
+    warningMessage.style.color = "#f00"; // Highlight in red
+    warningMessage.textContent = "Connection closed. You are no longer in the chat.";
+    chatMessages.appendChild(warningMessage);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+};
+        window.addEventListener("beforeunload", () => {
+    ws.send(JSON.stringify({
+        type: "system",
+        content: `User${userNumber} has left the chat`
+    }));
+});
+       
+ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
 
-    const messageElement = document.createElement("div");
-
-    // Determine if the message is from the current user or another user
-    const isSelf = user === `User${userNumber}`;
-    messageElement.className = `message ${isSelf ? "self" : "other"}`;
-
-    const userElement = document.createElement("div");
-    userElement.className = "user";
-    userElement.textContent = `${user}>`;
-
-    const contentElement = document.createElement("div");
-    contentElement.className = "content";
-
-    if (replyTo) {
-        const replyElement = document.createElement("div");
-        replyElement.className = "reply";
-        replyElement.textContent = `Replying to ${replyTo.user}: "${replyTo.content}"`;
-        contentElement.appendChild(replyElement);
+    if (data.type === "system") {
+        displaySystemMessage(data.content);
     }
+     else if (data.type === "ping") {
+             displayPingMessage(data.content, data.user)
+     }
+      else {
+        displayMessage(data.content, data.user, data.replyTo, data.type === "file",data.pinged);
+    }
+};
+function displayPingMessage(content,user){
+   const chatMessages = document.getElementById("chatMessages");
+    const systemMessageElement = document.createElement("div");
+    systemMessageElement.className = "system-message";
+     systemMessageElement.style.color = "#ff0" //highlight yellow
+        systemMessageElement.textContent = `You have been pinged by ${user}: "${content}"`;
+        chatMessages.appendChild(systemMessageElement);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+        function displayMessage(content, user = "System", replyTo = null, isFile = false, pinged = false) {
+            const chatMessages = document.getElementById("chatMessages");
+            const messageElement = document.createElement("div");
+            const isSelf = user === `User${userNumber}`;
+            messageElement.className = `message ${isSelf ? "self" : "other"}`;
 
-    if (isFile) {
-        const img = document.createElement("img");
-        img.src = content;
-        img.alt = filename || "Uploaded image";
-        img.style.maxWidth = "200px";
-        img.style.borderRadius = "5px";
-        contentElement.appendChild(img);
+            // User metadata
+            const userMeta = document.createElement("div");
+            userMeta.className = "user-meta";
+            userMeta.textContent = isSelf ? "You" : user;
+            
+            // Image indicator
+            if(isFile){
+                const imageIndicator = document.createElement("span");
+                imageIndicator.className = "image-indicator";
+                imageIndicator.textContent = "[Image]";
+                userMeta.appendChild(imageIndicator);
+            }
+
+            messageElement.appendChild(userMeta);
+
+            const contentElement = document.createElement("div");
+            contentElement.className = `content ${pinged ? "pinged" : ""}`;
+            
+            // Reply container
+if (replyTo) {
+    const replyContainer = document.createElement("div");
+    replyContainer.className = "reply-container";
+
+    // Check if the reply content is base64 (usually starts with 'data:image/')
+    if (replyTo.content.startsWith("data:image/")) {
+        replyContainer.textContent = `Replying to ${replyTo.user}: [Image content]`;
     } else {
-        contentElement.textContent += content;
+        replyContainer.textContent = `Replying to ${replyTo.user}: "${replyTo.content}"`;
     }
 
-    messageElement.appendChild(userElement);
-    messageElement.appendChild(contentElement);
-
-    chatMessages.appendChild(messageElement);
-    chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll to the latest message
+    messageElement.appendChild(replyContainer); // Append before the content
 }
 
-            function sendMessage() {
-                const chatInput = document.getElementById("chatInput");
-                const fileInput = document.getElementById("fileInput");
-                const message = chatInput.value.trim();
+ 
+            // Image or text content
+            if (isFile) {
+                const img = document.createElement("img");
+                img.src = content;
+                contentElement.appendChild(img);
+            } else {
+                   let processedContent = content;
+    for (const shortcode in emojiMap) {
+        if (emojiMap.hasOwnProperty(shortcode)) {
+            const regex = new RegExp(escapeRegExp(shortcode), 'g');
+            processedContent = processedContent.replace(regex, emojiMap[shortcode]);
+          }
+     }
+     contentElement.innerHTML = processedContent
+            }
 
-                if (message) {
-                    const payload = JSON.stringify({
-                        type: "user",
-                        user: `User${userNumber}`,
-                        content: message,
-                        replyTo: replyToMessage,
-                    });
-                    ws.send(payload); // Send the message to the server
-                    chatInput.value = "";
-                    chatInput.placeholder = "Type your message...";
-                    replyToMessage = null;
-                } else if (fileInput.files.length > 0) {
-                    const file = fileInput.files[0];
-                    const reader = new FileReader();
+            messageElement.appendChild(contentElement);
 
-                    reader.onload = () => {
-                        const payload = JSON.stringify({
+            // Reply Button
+            const replyButton = document.createElement("button");
+            replyButton.className = "reply-button";
+            replyButton.textContent = "Reply";
+             replyButton.style.marginTop = "4px"
+            replyButton.onclick = () => {
+                replyToMessage = { user, content };
+                document.getElementById("chatInput").placeholder = `Replying to ${user}: "${content}"`;
+                document.getElementById("chatInput").focus();
+            };
+
+            messageElement.appendChild(replyButton);
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+  function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escape special characters
+}
+        function displaySystemMessage(content) {
+            const chatMessages = document.getElementById("chatMessages");
+            const systemMessageElement = document.createElement("div");
+            systemMessageElement.className = "system-message";
+            systemMessageElement.textContent = content;
+            chatMessages.appendChild(systemMessageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function sendMessage() {
+            const chatInput = document.getElementById("chatInput");
+            const fileInput = document.getElementById("fileInput");
+            const imageIndicator = document.getElementById("imageUploadIndicator");
+            let message = chatInput.value.trim();
+            imageIndicator.classList.remove("show"); //hide indicator on send
+               const mentionRegex = /@User\d+/g; //regex for user mentions
+            const mentions = message.match(mentionRegex); //find any mentions
+           
+              if(mentions){
+                  mentions.forEach(mentionedUser => {
+                     ws.send(JSON.stringify({ //send ping
+                           type: "ping",
+                           user: `User${userNumber}`,
+                         content: message,
+                         recipient: mentionedUser
+                        }));
+                   });
+              }
+             for (const shortcode in emojiMap) {
+        if (emojiMap.hasOwnProperty(shortcode)) {
+           const regex = new RegExp(escapeRegExp(shortcode), 'g');
+          message = message.replace(regex, emojiMap[shortcode]);
+          }
+     }
+
+            if (message) {
+                ws.send(JSON.stringify({
+                    type: "user",
+                    user: `User${userNumber}`,
+                    content: message,
+                     pinged: !!mentions, //set pinged as true if mentions exist
+                    replyTo: replyToMessage,
+                }));
+                chatInput.value = "";
+                chatInput.placeholder = "Type your message...";
+                replyToMessage = null;
+                  fileInput.value = ""; //clear input when no file is uploaded
+                return;
+            }
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+
+                    img.onload = () => {
+                        const canvas = document.createElement("canvas");
+                        const maxWidth = 300;
+                        const scale = maxWidth / img.width;
+                        canvas.width = maxWidth;
+                        canvas.height = img.height * scale;
+
+                        const ctx = canvas.getContext("2d");
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                        const compressedData = canvas.toDataURL("image/jpeg", 0.8);
+                        ws.send(JSON.stringify({
                             type: "file",
                             user: `User${userNumber}`,
-                            content: reader.result,
-                            filename: file.name,
+                            content: compressedData,
+                             pinged: !!mentions,
                             replyTo: replyToMessage,
-                        });
-                        ws.send(payload);
+                        }));
+                       fileInput.value = "";//clear input after reading file
                     };
-                    reader.readAsDataURL(file);
-                    fileInput.value = ""; // Reset file input
-                } else {
-                    alert("Please type a message or select an image before sending.");
-                }
+                };
+
+                reader.readAsDataURL(file);
+              
             }
+        }
+    
+    //Show Image Uploaded popup
+     document.getElementById("fileInput").addEventListener("change", () => {
+    const imageIndicator = document.getElementById("imageUploadIndicator");
+    imageIndicator.classList.add("show");
+    
+  });
+   
+        //cancel image upload, now the popup is clickable, and this fires on click
+       document.getElementById("imageUploadIndicator").addEventListener('click', (event) => {
+    const fileInput = document.getElementById("fileInput");
+     const imageIndicator = document.getElementById("imageUploadIndicator");
+      fileInput.value = "";
+    imageIndicator.classList.remove("show");
+  });
+       
 
-            function handleInput(event) {
-                const chatInput = document.getElementById("chatInput");
-                if (event.key === "Enter" && !event.shiftKey) {
-                    event.preventDefault(); // Prevent default newline behavior
-                    sendMessage(); // Send the message
-                }
+        function handleInput(event) {
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
             }
-
-            ws.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-
-                if (data.type === "user") {
-                    displayMessage(data.content, data.user, data.replyTo);
-                } else if (data.type === "file") {
-                    displayMessage(data.content, data.user, data.replyTo, true, data.filename);
-                } else if (data.type === "system") {
-                    displayMessage(data.content, "System");
-                }
-            };
-
-            ws.onopen = () => {
-                console.log("Connected to WebSocket server");
-            };
-
-            ws.onclose = () => {
-                console.log("Disconnected from WebSocket server");
-                displayMessage("You have been disconnected from the chat.", "System");
-            };
-
-            ws.onerror = (error) => {
-                console.error("WebSocket error:", error);
-            };
-
-            displayMessage("Welcome to the chat! You are User" + userNumber, "System");
-        </script>
-    </body>
+        }
+    </script>
+</body>
 </html>
-
