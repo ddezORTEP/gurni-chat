@@ -10,378 +10,483 @@
             background-color: #000;
             color: #0f0;
             font-family: "Press Start 2P", monospace;
-            margin: 10;
+            margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            width: 100vw;
             overflow: hidden;
-            flex-direction: column;
-            box-shadow: 0 0 2.5px #0f0, inset 0 0 2.5px #0f0;
-
+            box-shadow: none;
         }
-        a{
-            color: #0f0;
-            box-shadow: 0 0 15px #0f0, inset 0 0 10px #0f0;
 
-        }
-        .crt {
+        .crt-container {
             position: relative;
-            width: 90vw;
-            height: 90vh;
-            max-width: 800px;
-            max-height: 600px;
-            background-color: #000;
-            border: 5px solid #0f0;
-            overflow: hidden;
-            box-shadow: 0 0 15px #0f0, inset 0 0 10px #0f0;
             display: flex;
-            flex-direction: column;
-        }
-
-        /* Scan lines effect */
-        .crt::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
+            justify-content: center;
+            align-items: stretch;
             width: 100%;
             height: 100%;
+        }
+
+        .crt, .online-users-panel{
+             position: relative;
+              display: flex;
+              flex-direction: column;
+             overflow: hidden;
+            background-color: #000;
+             border: 5px solid #0f0;
+            box-shadow: 0 0 15px #0f0, inset 0 0 10px #0f0;
+        }
+         .crt{
+            flex: 1;
+             max-width: none;
+            max-height: none;
+        }
+
+
+        /* Scan lines effect */
+        .crt::before, .online-users-panel::before {
+            content: "";
+             position: absolute;
+            top: 0;
+             left: 0;
+            width: 100%;
+             height: 100%;
             background: repeating-linear-gradient(
                 0deg,
                 rgba(0, 255, 0, 0.15),
-                rgba(0, 255, 0, 0.15) 1px,
-                transparent 1px,
-                transparent 2px
+                 rgba(0, 255, 0, 0.15) 1px,
+               transparent 1px,
+               transparent 2px
             );
-            pointer-events: none;
-            animation: scan 10s linear infinite;
-            z-index: 1;
+             pointer-events: none;
+             animation: scan 10s linear infinite;
+            z-index: 3; /* Increased z-index to put on top */
+          box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
         }
 
-        /* Screen flicker effect */
-        .crt::after {
-            content: "";
-            position: absolute;
-            top: 0;
+       /* Screen flicker effect */
+        .crt::after, .online-users-panel::after {
+             content: "";
+           position: absolute;
+           top: 0;
             left: 0;
-            width: 100%;
+           width: 100%;
             height: 100%;
-            background: rgba(0, 255, 0, 0.1);
+           background: rgba(0, 255, 0, 0.1);
             opacity: 0;
             pointer-events: none;
             animation: flicker 0.15s infinite;
-            z-index: 1;
-        }
+             z-index: 2;
+               box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+       }
 
-        @keyframes scan {
+       @keyframes scan {
             0% { transform: translateY(0); }
-            100% { transform: translateY(100%); }
-        }
+           100% { transform: translateY(100%); }
+       }
 
         @keyframes flicker {
             0% { opacity: 0.1; }
             50% { opacity: 0; }
-            100% { opacity: 0.1; }
+          100% { opacity: 0.1; }
         }
-
-        .crt-content {
-            flex: 1;
-            display: flex;
+         .crt-lens-effect, .online-users-panel .lens-effect {
+             position: absolute;
+             top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            border-radius: 50%;
+            background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.15) 20%, transparent 60%);
+             z-index: 1;
+            opacity: 0.6;
+             pointer-events: none;
+           transform: scale(1.1);
+               box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+       }
+       .crt-content {
+             flex: 1;
+           display: flex;
             flex-direction: column;
-            padding: 10px;
+             padding: 10px;
             overflow-y: auto;
-            position: relative;
-            z-index: 2;
-        }
-
+           position: relative;
+            z-index: 0;/* Reduced z-index to be under the scanlines */
+              box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+       }
+      /* Hide scrollbars */
+        .crt-content::-webkit-scrollbar,
+        .online-users-panel::-webkit-scrollbar,
+         .online-users-panel ul::-webkit-scrollbar{
+            display: none;
+       }
         /* Messages Styling */
-        .message {
-            display: flex;
-            flex-direction: column;
+       .message {
+           display: flex;
+             flex-direction: column;
             margin-bottom: 15px;
         }
 
         .message.self {
-            align-items: flex-end;
-        }
+           align-items: flex-end;
+       }
 
-        .message.other {
+       .message.other {
             align-items: flex-start;
+       }
+
+       .user-meta {
+          font-size: 0.8rem;
+           color: #6f6;
+           margin-bottom: 5px;
+          display: flex; /* Add this to keep user and image indicator on same line */
+           align-items: center;
+               box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
         }
 
-        .user-meta {
-            font-size: 0.8rem;
-            color: #6f6;
-            margin-bottom: 5px;
-             display: flex; /* Add this to keep user and image indicator on same line */
-             align-items: center;
+        .user-meta .image-indicator {
+           font-size: 0.7rem;
+           margin-left: 5px; /* Space between user name and the image indicator */
+             color: #3f3;
+               box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
         }
 
-       .user-meta .image-indicator {
-    font-size: 0.7rem;
-    margin-left: 5px; /* Space between user name and the image indicator */
-    color: #3f3;
-    }
-
-        .content {
+         .content {
             max-width: 60%;
             padding: 8px;
             background-color: #000;
             color: #0f0;
-            border: 2px solid #0f0;
+           border: 2px solid #0f0;
             border-radius: 4px;
             font-size: 0.9rem;
-            word-wrap: break-word;
+           word-wrap: break-word;
             text-shadow: 0 0 5px #0f0;
-             position: relative;
-        }
-         .content.pinged {
-             animation: pingGlow 1s ease-in-out 1; /* Apply ping glow */
-         }
+           position: relative;
+               box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+             overflow-wrap: anywhere;
+       }
+       .content.pinged {
+           animation: pingGlow 1s ease-in-out 1; /* Apply ping glow */
+       }
           @keyframes pingGlow {
-            0% {
-             box-shadow: 0 0 5px #0f0;
+           0% {
+           box-shadow: 0 0 5px #0f0;
             }
-             50% {
-              box-shadow: 0 0 15px #0f0;
-             }
-              100% {
-              box-shadow: 0 0 5px #0f0;
-             }
-          }
+           50% {
+             box-shadow: 0 0 15px #0f0;
+           }
+             100% {
+             box-shadow: 0 0 5px #0f0;
+           }
+       }
 
         .message.self .content {
-            background-color: #0f0;
-            color: #000;
-            text-shadow: none;
+           background-color: #0f0;
+           color: #000;
+           text-shadow: none;
+             box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
         }
 
-       .reply-container {
-    font-size: 0.8rem;
-    background-color: rgba(0, 255, 0, 0.05); /* Slightly different from background */
-    color: #6f6;
-    padding: 8px;
-    border-left: 3px solid #0f0;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    box-shadow: 0 0 5px rgba(0, 255, 0, 0.2); /* Subtle glow for contrast */
-}
- 
+         .reply-container {
+           font-size: 0.8rem;
+            background-color: rgba(0, 255, 0, 0.05); /* Slightly different from background */
+            color: #6f6;
+            padding: 8px;
+            border-left: 3px solid #0f0;
+            margin-bottom: 10px;
+             border-radius: 5px;
+             box-shadow: 0 0 5px rgba(0, 255, 0, 0.2); /* Subtle glow for contrast */
+        }
+
         /* System Messages */
         .system-message {
-            text-align: center;
+           text-align: center;
             font-size: 0.8rem;
-            color: #0f0;
+           color: #0f0;
             margin-bottom: 10px;
             padding: 5px;
-            background: rgba(0, 255, 0, 0.1);
-            border-radius: 4px;
-            animation: glow 1s ease-in-out infinite alternate;
-        }
+             background: rgba(0, 255, 0, 0.1);
+             border-radius: 4px;
+           animation: glow 1s ease-in-out infinite alternate;
+               box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+       }
 
-        @keyframes glow {
+       @keyframes glow {
             from { text-shadow: 0 0 5px #0f0; }
-            to { text-shadow: 0 0 10px #0f0; }
-        }
+           to { text-shadow: 0 0 10px #0f0; }
+       }
 
         /* Images */
         img {
-            max-width: 200px;
+             max-width: 200px;
             margin-top: 10px;
-            border: 2px solid #0f0;
+           border: 2px solid #0f0;
             border-radius: 5px;
+               box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
         }
       
-    
+   
        .emoji{
            display: inline-block;
            font-size:1.1rem;
            margin: 0 2px;
-        }
+               box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+       }
 
         /* Enhanced Input Section Styling */
-       .chat-input {
-            display: flex;
+         .chat-input {
+           display: flex;
             padding: 15px;
-            background: #000;
+           background: #000;
             border-top: 2px solid #0f0;
-            gap: 10px;
-            position: relative;
-            z-index: 2;
+          gap: 10px;
+          position: relative;
+              z-index: 0; /* Reduced z-index to be under the scanlines */
+                box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
         }
     
-    /*  Popup style */
-    .image-upload-indicator {
-        position: absolute;
-        top: -30px; /* Position above input */
-        left: 0;
-        width: 100%;
-        text-align: center;
-        font-size: 0.7rem;
-        color: #0f0;
-        background: rgba(0, 255, 0, 0.1);
-        padding: 4px;
-        border-radius: 4px;
-        opacity: 0;
-        transition: opacity 0.3s ease; /* For smooth appearance */
-        pointer-events: auto;
-        box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
-        display: flex; /* Use flexbox */
-        align-items: center; /* Vertically align content */
-        justify-content: center; /* Horizontally align content */
-        cursor: pointer; /* Make it look clickable */
-    }
-     .image-upload-indicator.show {
-        opacity: 1; /* Show the popup */
-    }
+   /*  Popup style */
+       .image-upload-indicator {
+           position: absolute;
+             top: -30px; /* Position above input */
+           left: 0;
+             width: 100%;
+          text-align: center;
+            font-size: 0.7rem;
+            color: #0f0;
+           background: rgba(0, 255, 0, 0.1);
+            padding: 4px;
+             border-radius: 4px;
+            opacity: 0;
+             transition: opacity 0.3s ease; /* For smooth appearance */
+             pointer-events: auto;
+             box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+           display: flex; /* Use flexbox */
+             align-items: center; /* Vertically align content */
+            justify-content: center; /* Horizontally align content */
+             cursor: pointer; /* Make it look clickable */
+       }
+       .image-upload-indicator.show {
+          opacity: 1; /* Show the popup */
+        }
 
         /* Textarea Styling */
-        textarea {
+         textarea {
             flex: 1;
             padding: 12px;
             font-family: "Press Start 2P", monospace;
-            font-size: 0.8rem;
-            background: #000;
-            color: #0f0;
-            border: 2px solid #0f0;
-            border-radius: 4px;
+             font-size: 0.8rem;
+             background: #000;
+             color: #0f0;
+           border: 2px solid #0f0;
+             border-radius: 4px;
             resize: none;
             outline: none;
-            height: 40px;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+           height: 40px;
+           transition: all 0.3s ease;
+               box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
         }
 
         textarea:focus {
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
-            border-color: #0f0;
+           box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+           border-color: #0f0;
         }
 
-        textarea::placeholder {
-            color: #063;
-        }
+       textarea::placeholder {
+           color: #063;
+       }
 
         /* Button Styling */
-        button, 
-        label,
-        .reply-button {
+       button,
+         label,
+         .reply-button {
             padding: 10px 15px;
             font-family: "Press Start 2P", monospace;
-            font-size: 0.7rem;
+             font-size: 0.7rem;
             color: #0f0;
             background: #000;
             border: 2px solid #0f0;
             border-radius: 4px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
+             transition: all 0.2s ease;
+             position: relative;
             overflow: hidden;
             text-transform: uppercase;
-            min-width: 80px;
-            text-align: center;
-            box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+             min-width: 80px;
+           text-align: center;
+                box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
         }
-        button:hover, 
+       button:hover,
         label:hover,
         .reply-button:hover {
-            background: #0f0;
-            color: #000;
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
-        }
+           background: #0f0;
+           color: #000;
+             box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
+       }
 
         button:active,
-        label:active,
+         label:active,
         .reply-button:active {
             transform: translateY(2px);
-        }
+       }
 
         /* Special styling for reply button */
-        .reply-button {
+       .reply-button {
             font-size: 0.6rem;
-            padding: 5px 10px;
-            margin-top: 8px;
+             padding: 5px 10px;
+           margin-top: 8px;
             opacity: 0.7;
-            border-width: 1px;
-            min-width: 60px;
+             border-width: 1px;
+           min-width: 60px;
+                box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
         }
 
-        .reply-button:hover {
-            opacity: 1;
+       .reply-button:hover {
+         opacity: 1;
         }
 
         /* Upload button specific styling */
         label[for="fileInput"] {
-            display: inline-flex;
+          display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 5px;
+               box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
         }
 
-        label[for="fileInput"]::before {
-            content: "📁";
+       label[for="fileInput"]::before {
+          content: "📁";
             font-size: 0.8rem;
+                box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
         }
 
-        /* Button press effect */
-        button::after,
+       /* Button press effect */
+       button::after,
         label::after,
-        .reply-button::after {
+         .reply-button::after {
             content: "";
-            position: absolute;
-            top: 50%;
+             position: absolute;
+           top: 50%;
             left: 50%;
-            width: 5px;
+           width: 5px;
             height: 5px;
             background: rgba(0, 255, 0, 0.5);
-            opacity: 0;
+           opacity: 0;
             border-radius: 100%;
-            transform: translate(-50%, -50%);
+           transform: translate(-50%, -50%);
             transition: all 0.5s ease;
-        }
+       }
 
         button:focus::after,
-        label:focus::after,
-        .reply-button:focus::after {
-            width: 150%;
+         label:focus::after,
+       .reply-button:focus::after {
+           width: 150%;
             height: 150%;
             opacity: 0;
-            transition: all 0s ease;
-        }
+           transition: all 0s ease;
+       }
 
         input[type="file"] {
-            display: none;
+             display: none;
         }
 
         .chat-input:focus-within {
-            background: linear-gradient(to bottom, 
+           background: linear-gradient(to bottom,
                 rgba(0, 255, 0, 0.1),
-                rgba(0, 0, 0, 1) 10%
+              rgba(0, 0, 0, 1) 10%
             );
+       }
+
+         /* Online Users Panel Styling */
+        .online-users-panel {
+           width: 200px; /* Fixed width for user panel */
+             padding: 15px;
+            background: #000;
+            border-left: 2px solid #0f0;
+            overflow-y: auto; /* Allows scrolling */
+           color: #0f0;
+            display: flex;
+           flex-direction: column;
+           align-items: flex-start;
+            max-height: 100%;
+            box-sizing: border-box;
+            text-align: left;
+              box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+        }
+         .online-users-panel .lens-effect {
+           position: absolute;
+             top: 0;
+             left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+             border-radius: 50%;
+           background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.15) 20%, transparent 60%);
+            z-index: 1;
+           opacity: 0.6;
+            pointer-events: none;
+             transform: scale(1.1);
+                box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+       }
+
+        .online-users-panel h2 {
+            font-size: 1rem;
+             margin-bottom: 10px;
+               text-align: center;
+        }
+
+        .online-users-panel ul {
+             list-style: none;
+           padding: 0;
+        }
+
+        .online-users-panel li {
+            margin-bottom: 5px;
+            font-size: 0.8rem;
+            padding: 5px;
+           border: 2px solid #0f0;
+             border-radius: 4px;
+               box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+        }
+        .online-users-panel li.current-user {
+          color: #000;
+            background: #0f0;
+               text-shadow: none;
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
     
-             <div class="crt">
-        <div class="crt-content" id="chatMessages">
-            <!-- Messages will appear here -->
+    <div class="crt-container">
+              <div class="crt">
+                <div class="crt-lens-effect"></div>
+                  <div class="crt-content" id="chatMessages">
+                      <!-- Messages will appear here -->
+                  </div>
+                 <div class="chat-input">
+                     <div class="image-upload-indicator" id="imageUploadIndicator">
+                     Image Uploaded (click here to remove)
+                  </div>
+                    <textarea id="chatInput" placeholder="Type your message..." onkeydown="handleInput(event)"></textarea>
+                     <label for="fileInput">Upload</label>
+                    <input type="file" id="fileInput" accept="image/*">
+                   <button onclick="sendMessage()">Send</button>
+                  </div>
+              </div>
+      
+        <div class="online-users-panel" >
+              <div class="lens-effect"></div>
+            <h2>Online Users</h2>
+              <ul id="onlineUsersList">
+                <!-- Online users will appear here -->
+             </ul>
         </div>
-        <div class="chat-input">
-              <div class="image-upload-indicator" id="imageUploadIndicator">
-              Image Uploaded (click here to remove)
-            </div>
-            <textarea id="chatInput" placeholder="Type your message..." onkeydown="handleInput(event)"></textarea>
-            <label for="fileInput">Upload</label>
-            <input type="file" id="fileInput" accept="image/*">
-            <button onclick="sendMessage()">Send</button>
-        </div>
-      </div>
-      <br>
-      <br>
-      <a href=/>back to home</a>
+     </div>
     
     <script>
         const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
@@ -392,54 +497,63 @@
          const emojiMap = {
             ':)': '<span class="emoji">^_^</span>',
             ':(': '<span class="emoji">o_o</span>',
-            ':D': '<span class="emoji">\\o/</span>',
-            '<3': '<span class="emoji"><3</span>',
+             ':D': '<span class="emoji">\\o/</span>',
+             '<3': '<span class="emoji"><3</span>',
             ':O': '<span class="emoji">O_O</span>',
-            ':P': '<span class="emoji">:-P</span>',
+             ':P': '<span class="emoji">:-P</span>',
              ';)': '<span class="emoji">;-)</span>',
              'XD': '<span class="emoji">XD</span>',
         };
+           let onlineUsers = {}; // Object to store online users
+
         // Send join message when connecting
         ws.onopen = () => {
+          //send join message with user number.
             ws.send(JSON.stringify({
-                type: "system",
-                content: `User${userNumber} has joined the chat`
+                type: "join",
+                 user: `User${userNumber}`
             }));
+          
         };
-
- ws.onclose = () => {
+  ws.onclose = () => {
     // Display a local message indicating the user left
     displaySystemMessage(`You (User${userNumber}) have left the chat`);
 
-    // Optionally, inform the user the connection has ended
+     // Optionally, inform the user the connection has ended
     const chatMessages = document.getElementById("chatMessages");
-    const warningMessage = document.createElement("div");
+     const warningMessage = document.createElement("div");
     warningMessage.className = "system-message";
-    warningMessage.style.color = "#f00"; // Highlight in red
+     warningMessage.style.color = "#f00"; // Highlight in red
     warningMessage.textContent = "Connection closed. You are no longer in the chat.";
     chatMessages.appendChild(warningMessage);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 };
         window.addEventListener("beforeunload", () => {
-    ws.send(JSON.stringify({
-        type: "system",
-        content: `User${userNumber} has left the chat`
-    }));
-});
+           ws.send(JSON.stringify({
+               type: "leave",
+                user: `User${userNumber}`
+           }));
+        });
        
 ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
+    console.log("received message", data);
 
-    if (data.type === "system") {
-        displaySystemMessage(data.content);
-    }
-     else if (data.type === "ping") {
-             displayPingMessage(data.content, data.user)
-     }
-      else {
-        displayMessage(data.content, data.user, data.replyTo, data.type === "file",data.pinged);
-    }
-};
+        if(data.type === "userList"){
+           onlineUsers = data.users;
+            updateUserList();
+        }
+        else if (data.type === "system") {
+            displaySystemMessage(data.content);
+       }
+       else if (data.type === "ping") {
+           displayPingMessage(data.content, data.user);
+        }
+    
+       else {
+            displayMessage(data.content, data.user, data.replyTo, data.type === "file",data.pinged);
+        }
+    };
 function displayPingMessage(content,user){
    const chatMessages = document.getElementById("chatMessages");
     const systemMessageElement = document.createElement("div");
@@ -447,31 +561,31 @@ function displayPingMessage(content,user){
      systemMessageElement.style.color = "#ff0" //highlight yellow
         systemMessageElement.textContent = `You have been pinged by ${user}: "${content}"`;
         chatMessages.appendChild(systemMessageElement);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
         function displayMessage(content, user = "System", replyTo = null, isFile = false, pinged = false) {
             const chatMessages = document.getElementById("chatMessages");
             const messageElement = document.createElement("div");
             const isSelf = user === `User${userNumber}`;
-            messageElement.className = `message ${isSelf ? "self" : "other"}`;
+           messageElement.className = `message ${isSelf ? "self" : "other"}`;
 
             // User metadata
             const userMeta = document.createElement("div");
             userMeta.className = "user-meta";
-            userMeta.textContent = isSelf ? "You" : user;
+           userMeta.textContent = isSelf ? "You" : user;
             
-            // Image indicator
-            if(isFile){
+           // Image indicator
+           if(isFile){
                 const imageIndicator = document.createElement("span");
-                imageIndicator.className = "image-indicator";
-                imageIndicator.textContent = "[Image]";
-                userMeta.appendChild(imageIndicator);
+                 imageIndicator.className = "image-indicator";
+               imageIndicator.textContent = "[Image]";
+              userMeta.appendChild(imageIndicator);
             }
 
-            messageElement.appendChild(userMeta);
+           messageElement.appendChild(userMeta);
 
-            const contentElement = document.createElement("div");
-            contentElement.className = `content ${pinged ? "pinged" : ""}`;
+           const contentElement = document.createElement("div");
+             contentElement.className = `content ${pinged ? "pinged" : ""}`;
             
             // Reply container
 if (replyTo) {
@@ -480,157 +594,175 @@ if (replyTo) {
 
     // Check if the reply content is base64 (usually starts with 'data:image/')
     if (replyTo.content.startsWith("data:image/")) {
-        replyContainer.textContent = `Replying to ${replyTo.user}: [Image content]`;
+       replyContainer.textContent = `Replying to ${replyTo.user}: [Image content]`;
     } else {
         replyContainer.textContent = `Replying to ${replyTo.user}: "${replyTo.content}"`;
-    }
+   }
 
     messageElement.appendChild(replyContainer); // Append before the content
 }
 
  
             // Image or text content
-            if (isFile) {
+          if (isFile) {
                 const img = document.createElement("img");
-                img.src = content;
-                contentElement.appendChild(img);
-            } else {
-                   let processedContent = content;
-    for (const shortcode in emojiMap) {
-        if (emojiMap.hasOwnProperty(shortcode)) {
+               img.src = content;
+              contentElement.appendChild(img);
+         } else {
+                 let processedContent = content;
+   for (const shortcode in emojiMap) {
+       if (emojiMap.hasOwnProperty(shortcode)) {
             const regex = new RegExp(escapeRegExp(shortcode), 'g');
             processedContent = processedContent.replace(regex, emojiMap[shortcode]);
           }
-     }
-     contentElement.innerHTML = processedContent
+      }
+        contentElement.innerHTML = processedContent
             }
 
             messageElement.appendChild(contentElement);
 
             // Reply Button
-            const replyButton = document.createElement("button");
-            replyButton.className = "reply-button";
-            replyButton.textContent = "Reply";
-             replyButton.style.marginTop = "4px"
-            replyButton.onclick = () => {
-                replyToMessage = { user, content };
-                document.getElementById("chatInput").placeholder = `Replying to ${user}: "${content}"`;
-                document.getElementById("chatInput").focus();
-            };
+           const replyButton = document.createElement("button");
+             replyButton.className = "reply-button";
+           replyButton.textContent = "Reply";
+            replyButton.style.marginTop = "4px"
+           replyButton.onclick = () => {
+               replyToMessage = { user, content };
+             document.getElementById("chatInput").placeholder = `Replying to ${user}: "${content}"`;
+              document.getElementById("chatInput").focus();
+          };
 
-            messageElement.appendChild(replyButton);
-            chatMessages.appendChild(messageElement);
+           messageElement.appendChild(replyButton);
+           chatMessages.appendChild(messageElement);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
   function escapeRegExp(string) {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escape special characters
-}
-        function displaySystemMessage(content) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escape special characters
+   }
+       function displaySystemMessage(content) {
             const chatMessages = document.getElementById("chatMessages");
             const systemMessageElement = document.createElement("div");
-            systemMessageElement.className = "system-message";
-            systemMessageElement.textContent = content;
-            chatMessages.appendChild(systemMessageElement);
+           systemMessageElement.className = "system-message";
+           systemMessageElement.textContent = content;
+          chatMessages.appendChild(systemMessageElement);
             chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
+       }
 
-        function sendMessage() {
+      function sendMessage() {
             const chatInput = document.getElementById("chatInput");
             const fileInput = document.getElementById("fileInput");
-            const imageIndicator = document.getElementById("imageUploadIndicator");
-            let message = chatInput.value.trim();
-            imageIndicator.classList.remove("show"); //hide indicator on send
-               const mentionRegex = /@User\d+/g; //regex for user mentions
-            const mentions = message.match(mentionRegex); //find any mentions
+          const imageIndicator = document.getElementById("imageUploadIndicator");
+           let message = chatInput.value.trim();
+           imageIndicator.classList.remove("show"); //hide indicator on send
+            const mentionRegex = /@User\d+/g; //regex for user mentions
+          const mentions = message.match(mentionRegex); //find any mentions
            
-              if(mentions){
-                  mentions.forEach(mentionedUser => {
-                     ws.send(JSON.stringify({ //send ping
-                           type: "ping",
-                           user: `User${userNumber}`,
-                         content: message,
+            if(mentions){
+                 mentions.forEach(mentionedUser => {
+                  ws.send(JSON.stringify({ //send ping
+                         type: "ping",
+                         user: `User${userNumber}`,
+                           content: message,
                          recipient: mentionedUser
-                        }));
-                   });
-              }
-             for (const shortcode in emojiMap) {
-        if (emojiMap.hasOwnProperty(shortcode)) {
-           const regex = new RegExp(escapeRegExp(shortcode), 'g');
-          message = message.replace(regex, emojiMap[shortcode]);
-          }
-     }
+                     }));
+                  });
+            }
+           for (const shortcode in emojiMap) {
+                if (emojiMap.hasOwnProperty(shortcode)) {
+                const regex = new RegExp(escapeRegExp(shortcode), 'g');
+                message = message.replace(regex, emojiMap[shortcode]);
+             }
+       }
 
             if (message) {
                 ws.send(JSON.stringify({
-                    type: "user",
+                     type: "user",
                     user: `User${userNumber}`,
                     content: message,
                      pinged: !!mentions, //set pinged as true if mentions exist
                     replyTo: replyToMessage,
                 }));
                 chatInput.value = "";
-                chatInput.placeholder = "Type your message...";
-                replyToMessage = null;
-                  fileInput.value = ""; //clear input when no file is uploaded
-                return;
+              chatInput.placeholder = "Type your message...";
+              replyToMessage = null;
+               fileInput.value = ""; //clear input when no file is uploaded
+                 return;
             }
-            if (fileInput.files.length > 0) {
-                const file = fileInput.files[0];
-                const reader = new FileReader();
+           if (fileInput.files.length > 0) {
+               const file = fileInput.files[0];
+               const reader = new FileReader();
 
-                reader.onload = (event) => {
-                    const img = new Image();
-                    img.src = event.target.result;
+              reader.onload = (event) => {
+                 const img = new Image();
+                   img.src = event.target.result;
 
-                    img.onload = () => {
-                        const canvas = document.createElement("canvas");
-                        const maxWidth = 300;
+                  img.onload = () => {
+                       const canvas = document.createElement("canvas");
+                       const maxWidth = 300;
                         const scale = maxWidth / img.width;
-                        canvas.width = maxWidth;
-                        canvas.height = img.height * scale;
+                       canvas.width = maxWidth;
+                       canvas.height = img.height * scale;
 
                         const ctx = canvas.getContext("2d");
                         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
                         const compressedData = canvas.toDataURL("image/jpeg", 0.8);
                         ws.send(JSON.stringify({
-                            type: "file",
+                           type: "file",
                             user: `User${userNumber}`,
-                            content: compressedData,
-                             pinged: !!mentions,
-                            replyTo: replyToMessage,
-                        }));
+                             content: compressedData,
+                           pinged: !!mentions,
+                           replyTo: replyToMessage,
+                      }));
                        fileInput.value = "";//clear input after reading file
                     };
-                };
+               };
 
-                reader.readAsDataURL(file);
-              
-            }
-        }
+              reader.readAsDataURL(file);
+            
+           }
+       }
     
     //Show Image Uploaded popup
-     document.getElementById("fileInput").addEventListener("change", () => {
-    const imageIndicator = document.getElementById("imageUploadIndicator");
-    imageIndicator.classList.add("show");
+    document.getElementById("fileInput").addEventListener("change", () => {
+      const imageIndicator = document.getElementById("imageUploadIndicator");
+        imageIndicator.classList.add("show");
     
-  });
+   });
    
         //cancel image upload, now the popup is clickable, and this fires on click
-       document.getElementById("imageUploadIndicator").addEventListener('click', (event) => {
-    const fileInput = document.getElementById("fileInput");
-     const imageIndicator = document.getElementById("imageUploadIndicator");
-      fileInput.value = "";
-    imageIndicator.classList.remove("show");
-  });
+     document.getElementById("imageUploadIndicator").addEventListener('click', (event) => {
+       const fileInput = document.getElementById("fileInput");
+         const imageIndicator = document.getElementById("imageUploadIndicator");
+       fileInput.value = "";
+        imageIndicator.classList.remove("show");
+   });
        
 
         function handleInput(event) {
             if (event.key === "Enter" && !event.shiftKey) {
-                event.preventDefault();
-                sendMessage();
-            }
+              event.preventDefault();
+               sendMessage();
+          }
         }
+
+        function updateUserList() {
+            const onlineUsersList = document.getElementById('onlineUsersList');
+            onlineUsersList.innerHTML = ''; // Clear existing list
+
+            for (const user in onlineUsers) {
+                 if (onlineUsers.hasOwnProperty(user)) {
+                   const li = document.createElement('li');
+                     li.textContent = user;
+                   if(user === `User${userNumber}`){
+                       li.classList.add("current-user");
+                   }
+                   onlineUsersList.appendChild(li);
+               }
+            }
+         }
+
+       
     </script>
 </body>
 </html>
