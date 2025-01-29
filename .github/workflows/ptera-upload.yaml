@@ -1,0 +1,40 @@
+name: Upload to Pterodactyl server
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '.gitignore'
+      - '.github/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy to Pterodactyl
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Archive Release
+        uses: thedoctor0/zip-release@0.7.6
+        with:
+          type: 'zip'
+          filename: 'release.zip'
+          exclusions: '*.git* *.npm* *.github* /*node_modules/* *.gitignore*'
+      - name: Uploading to Pterodactyl
+        uses: rexlManu/pterodactyl-upload-action@v2.4
+        with:
+          panel-host: "https://panel.fps.ms/" # https://panel.com/
+          api-key: "ptlc_bQ5MLsCwLDFhSB8c9keAsh1FARfl56tQZxa7H4x9Xy6"
+          server-id: "39f9ef8e-efa2-4743-b0c7-b061547d1030"
+          #   server-ids: |
+          #     5f095019
+          #     7f095019
+          sources: |
+            release.zip
+          target: "./"
+          # If you want to restart the servers after successful upload
+          restart: true
+          # If you want to decompress the files after successful upload
+          decompress-target: true
