@@ -25,7 +25,7 @@ jobs:
       - name: Uploading to Pterodactyl
         uses: rexlManu/pterodactyl-upload-action@v2.4
         with:
-          panel-host: "https://panel.fps.ms/server/39f9ef8e" # https://panel.com/
+          panel-host: "https://panel.fps.ms/server/" # https://panel.com/
           api-key: "ptlc_bQ5MLsCwLDFhSB8c9keAsh1FARfl56tQZxa7H4x9Xy6"
           server-id: "39f9ef8e-efa2-4743-b0c7-b061547d1030"
           #   server-ids: |
