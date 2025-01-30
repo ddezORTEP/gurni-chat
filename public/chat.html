@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gurni Chat</title>
+    <title>Retro Chat Terminal</title>
     <style>
         /* CRT and Styling */
         body {
@@ -20,7 +20,11 @@
             overflow: hidden;
             box-shadow: none;
         }
+        a{
+            color: #0f0;
+            box-shadow: 0 0 15px #0f0, inset 0 0 10px #0f0;
 
+        }
         .crt-container {
             position: relative;
             display: flex;
@@ -29,213 +33,199 @@
             width: 100%;
             height: 100%;
         }
-
         .crt, .online-users-panel{
              position: relative;
-              display: flex;
-              flex-direction: column;
+            display: flex;
+           flex-direction: column;
              overflow: hidden;
             background-color: #000;
-             border: 5px solid #0f0;
-            box-shadow: 0 0 15px #0f0, inset 0 0 10px #0f0;
+            border: 5px solid #0f0;
+           box-shadow: 0 0 15px #0f0, inset 0 0 10px #0f0;
         }
-         .crt{
+        .crt{
             flex: 1;
-             max-width: none;
-            max-height: none;
+            max-width: none;
+             max-height: none;
         }
 
 
         /* Scan lines effect */
         .crt::before, .online-users-panel::before {
             content: "";
-             position: absolute;
-            top: 0;
-             left: 0;
-            width: 100%;
-             height: 100%;
-            background: repeating-linear-gradient(
-                0deg,
-                rgba(0, 255, 0, 0.15),
-                 rgba(0, 255, 0, 0.15) 1px,
-               transparent 1px,
-               transparent 2px
-            );
-             pointer-events: none;
-             animation: scan 10s linear infinite;
-            z-index: 3; /* Increased z-index to put on top */
-          box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
-        }
-
-       /* Screen flicker effect */
-        .crt::after, .online-users-panel::after {
-             content: "";
-           position: absolute;
-           top: 0;
-            left: 0;
-           width: 100%;
-            height: 100%;
-           background: rgba(0, 255, 0, 0.1);
-            opacity: 0;
-            pointer-events: none;
-            animation: flicker 0.15s infinite;
-             z-index: 2;
-               box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
-       }
-
-       @keyframes scan {
-            0% { transform: translateY(0); }
-           100% { transform: translateY(100%); }
-       }
-
-        @keyframes flicker {
-            0% { opacity: 0.1; }
-            50% { opacity: 0; }
-          100% { opacity: 0.1; }
-        }
-         .crt-lens-effect, .online-users-panel .lens-effect {
-             position: absolute;
+            position: absolute;
              top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 255, 0, 0.15),
+                rgba(0, 255, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+           z-index: 3; /* Increased z-index to put on top */
+           box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+        }
+
+        /* Screen flicker effect */
+       .crt::after, .online-users-panel::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+           width: 100%;
+            height: 100%;
+           background: rgba(0, 255, 0, 0.1);
+           opacity: 0;
+            pointer-events: none;
+           z-index: 2;
+               box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+        }
+       .crt-lens-effect, .online-users-panel .lens-effect {
+            position: absolute;
+             top: 0;
+            left: 0;
+           width: 100%;
+            height: 100%;
             pointer-events: none;
             border-radius: 50%;
             background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.15) 20%, transparent 60%);
-             z-index: 1;
-            opacity: 0.6;
-             pointer-events: none;
+            z-index: 1;
+           opacity: 0.6;
+            pointer-events: none;
            transform: scale(1.1);
-               box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
-       }
-       .crt-content {
-             flex: 1;
+                box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+        }
+         .crt-content {
+            flex: 1;
            display: flex;
-            flex-direction: column;
-             padding: 10px;
-            overflow-y: auto;
-           position: relative;
-            z-index: 0;/* Reduced z-index to be under the scanlines */
-              box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
-       }
-      /* Hide scrollbars */
+           flex-direction: column;
+            padding: 10px;
+           overflow-y: auto;
+            position: relative;
+             z-index: 0;/* Reduced z-index to be under the scanlines */
+               box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+        }
+        /* Hide scrollbar */
         .crt-content::-webkit-scrollbar,
         .online-users-panel::-webkit-scrollbar,
          .online-users-panel ul::-webkit-scrollbar{
-            display: none;
-       }
+          display: none;
+        }
+
         /* Messages Styling */
-       .message {
-           display: flex;
+         .message {
+            display: flex;
              flex-direction: column;
             margin-bottom: 15px;
         }
 
         .message.self {
-           align-items: flex-end;
+            align-items: flex-end;
+        }
+
+         .message.other {
+           align-items: flex-start;
        }
 
-       .message.other {
-            align-items: flex-start;
-       }
-
-       .user-meta {
-          font-size: 0.8rem;
-           color: #6f6;
-           margin-bottom: 5px;
-          display: flex; /* Add this to keep user and image indicator on same line */
+        .user-meta {
+           font-size: 0.8rem;
+            color: #6f6;
+            margin-bottom: 5px;
+           display: flex; /* Add this to keep user and image indicator on same line */
            align-items: center;
                box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
         }
 
-        .user-meta .image-indicator {
-           font-size: 0.7rem;
-           margin-left: 5px; /* Space between user name and the image indicator */
+      .user-meta .image-indicator {
+          font-size: 0.7rem;
+            margin-left: 5px; /* Space between user name and the image indicator */
              color: #3f3;
-               box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+                box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
         }
 
-         .content {
-            max-width: 60%;
+       .content {
+           max-width: 60%;
             padding: 8px;
             background-color: #000;
-            color: #0f0;
+           color: #0f0;
            border: 2px solid #0f0;
-            border-radius: 4px;
-            font-size: 0.9rem;
-           word-wrap: break-word;
-            text-shadow: 0 0 5px #0f0;
-           position: relative;
-               box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
-             overflow-wrap: anywhere;
+           border-radius: 4px;
+           font-size: 0.9rem;
+            word-wrap: break-word;
+           text-shadow: 0 0 5px #0f0;
+          position: relative;
+              overflow-wrap: anywhere;
        }
-       .content.pinged {
+         .content.pinged {
            animation: pingGlow 1s ease-in-out 1; /* Apply ping glow */
-       }
-          @keyframes pingGlow {
+        }
+         @keyframes pingGlow {
            0% {
            box-shadow: 0 0 5px #0f0;
-            }
-           50% {
+           }
+            50% {
              box-shadow: 0 0 15px #0f0;
            }
-             100% {
+          100% {
              box-shadow: 0 0 5px #0f0;
-           }
-       }
-
-        .message.self .content {
-           background-color: #0f0;
-           color: #000;
-           text-shadow: none;
-             box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+            }
         }
 
-         .reply-container {
+       .message.self .content {
+           background-color: #0f0;
+            color: #000;
+            text-shadow: none;
+               box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+       }
+
+        .reply-container {
            font-size: 0.8rem;
             background-color: rgba(0, 255, 0, 0.05); /* Slightly different from background */
             color: #6f6;
-            padding: 8px;
+           padding: 8px;
             border-left: 3px solid #0f0;
             margin-bottom: 10px;
-             border-radius: 5px;
-             box-shadow: 0 0 5px rgba(0, 255, 0, 0.2); /* Subtle glow for contrast */
-        }
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 255, 0, 0.2); /* Subtle glow for contrast */
+       }
 
         /* System Messages */
         .system-message {
            text-align: center;
             font-size: 0.8rem;
            color: #0f0;
-            margin-bottom: 10px;
+           margin-bottom: 10px;
             padding: 5px;
              background: rgba(0, 255, 0, 0.1);
              border-radius: 4px;
-           animation: glow 1s ease-in-out infinite alternate;
+             animation: glow 1s ease-in-out infinite alternate;
                box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
-       }
+        }
 
        @keyframes glow {
-            from { text-shadow: 0 0 5px #0f0; }
-           to { text-shadow: 0 0 10px #0f0; }
-       }
+          from { text-shadow: 0 0 5px #0f0; }
+          to { text-shadow: 0 0 10px #0f0; }
+        }
 
         /* Images */
         img {
-             max-width: 200px;
+           max-width: 200px;
             margin-top: 10px;
-           border: 2px solid #0f0;
+            border: 2px solid #0f0;
             border-radius: 5px;
                box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
-        }
+       }
       
-   
-       .emoji{
+ 
+        .emoji{
            display: inline-block;
            font-size:1.1rem;
-           margin: 0 2px;
+             margin: 0 2px;
                box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
-       }
+        }
 
         /* Enhanced Input Section Styling */
          .chat-input {
@@ -243,148 +233,148 @@
             padding: 15px;
            background: #000;
             border-top: 2px solid #0f0;
-          gap: 10px;
-          position: relative;
+            gap: 10px;
+            position: relative;
               z-index: 0; /* Reduced z-index to be under the scanlines */
-                box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+                 box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
         }
     
    /*  Popup style */
        .image-upload-indicator {
            position: absolute;
              top: -30px; /* Position above input */
-           left: 0;
+            left: 0;
              width: 100%;
-          text-align: center;
+           text-align: center;
             font-size: 0.7rem;
             color: #0f0;
-           background: rgba(0, 255, 0, 0.1);
-            padding: 4px;
-             border-radius: 4px;
+             background: rgba(0, 255, 0, 0.1);
+           padding: 4px;
+           border-radius: 4px;
             opacity: 0;
-             transition: opacity 0.3s ease; /* For smooth appearance */
-             pointer-events: auto;
-             box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
-           display: flex; /* Use flexbox */
+            transition: opacity 0.3s ease; /* For smooth appearance */
+           pointer-events: auto;
+                box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+            display: flex; /* Use flexbox */
              align-items: center; /* Vertically align content */
-            justify-content: center; /* Horizontally align content */
-             cursor: pointer; /* Make it look clickable */
+           justify-content: center; /* Horizontally align content */
+           cursor: pointer; /* Make it look clickable */
        }
-       .image-upload-indicator.show {
-          opacity: 1; /* Show the popup */
-        }
+        .image-upload-indicator.show {
+            opacity: 1; /* Show the popup */
+       }
 
         /* Textarea Styling */
-         textarea {
+        textarea {
             flex: 1;
-            padding: 12px;
+           padding: 12px;
             font-family: "Press Start 2P", monospace;
-             font-size: 0.8rem;
-             background: #000;
+            font-size: 0.8rem;
+            background: #000;
              color: #0f0;
            border: 2px solid #0f0;
-             border-radius: 4px;
-            resize: none;
+           border-radius: 4px;
+           resize: none;
             outline: none;
-           height: 40px;
+            height: 40px;
            transition: all 0.3s ease;
                box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
-        }
+       }
 
-        textarea:focus {
+       textarea:focus {
            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
            border-color: #0f0;
         }
 
-       textarea::placeholder {
-           color: #063;
+        textarea::placeholder {
+            color: #063;
        }
 
-        /* Button Styling */
-       button,
-         label,
-         .reply-button {
+       /* Button Styling */
+      button,
+        label,
+       .reply-button {
             padding: 10px 15px;
-            font-family: "Press Start 2P", monospace;
-             font-size: 0.7rem;
+           font-family: "Press Start 2P", monospace;
+            font-size: 0.7rem;
             color: #0f0;
-            background: #000;
+           background: #000;
             border: 2px solid #0f0;
             border-radius: 4px;
-            cursor: pointer;
-             transition: all 0.2s ease;
-             position: relative;
-            overflow: hidden;
-            text-transform: uppercase;
-             min-width: 80px;
-           text-align: center;
+             cursor: pointer;
+           transition: all 0.2s ease;
+           position: relative;
+           overflow: hidden;
+           text-transform: uppercase;
+           min-width: 80px;
+            text-align: center;
                 box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
-        }
-       button:hover,
-        label:hover,
-        .reply-button:hover {
-           background: #0f0;
-           color: #000;
-             box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
        }
+      button:hover,
+        label:hover,
+      .reply-button:hover {
+            background: #0f0;
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
+      }
 
-        button:active,
-         label:active,
+       button:active,
+       label:active,
         .reply-button:active {
             transform: translateY(2px);
-       }
-
-        /* Special styling for reply button */
-       .reply-button {
-            font-size: 0.6rem;
-             padding: 5px 10px;
-           margin-top: 8px;
-            opacity: 0.7;
-             border-width: 1px;
-           min-width: 60px;
-                box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
         }
 
+       /* Special styling for reply button */
+        .reply-button {
+            font-size: 0.6rem;
+           padding: 5px 10px;
+           margin-top: 8px;
+            opacity: 0.7;
+           border-width: 1px;
+            min-width: 60px;
+               box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+      }
+
        .reply-button:hover {
-         opacity: 1;
+            opacity: 1;
         }
 
         /* Upload button specific styling */
         label[for="fileInput"] {
           display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
+          align-items: center;
+           justify-content: center;
+           gap: 5px;
                box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
-        }
+      }
 
        label[for="fileInput"]::before {
           content: "📁";
-            font-size: 0.8rem;
+           font-size: 0.8rem;
                 box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
-        }
+      }
 
-       /* Button press effect */
+        /* Button press effect */
        button::after,
-        label::after,
-         .reply-button::after {
+         label::after,
+       .reply-button::after {
             content: "";
-             position: absolute;
+            position: absolute;
            top: 50%;
             left: 50%;
-           width: 5px;
+             width: 5px;
             height: 5px;
-            background: rgba(0, 255, 0, 0.5);
-           opacity: 0;
+           background: rgba(0, 255, 0, 0.5);
+             opacity: 0;
             border-radius: 100%;
            transform: translate(-50%, -50%);
-            transition: all 0.5s ease;
+           transition: all 0.5s ease;
        }
 
         button:focus::after,
-         label:focus::after,
-       .reply-button:focus::after {
-           width: 150%;
+        label:focus::after,
+      .reply-button:focus::after {
+            width: 150%;
             height: 150%;
             opacity: 0;
            transition: all 0s ease;
@@ -397,372 +387,538 @@
         .chat-input:focus-within {
            background: linear-gradient(to bottom,
                 rgba(0, 255, 0, 0.1),
-              rgba(0, 0, 0, 1) 10%
+                rgba(0, 0, 0, 1) 10%
             );
-       }
-
-         /* Online Users Panel Styling */
+        }
+        /* Online Users Panel Styling */
         .online-users-panel {
-           width: 200px; /* Fixed width for user panel */
+            width: 200px;
              padding: 15px;
             background: #000;
-            border-left: 2px solid #0f0;
+           border-left: 2px solid #0f0;
             overflow-y: auto; /* Allows scrolling */
            color: #0f0;
             display: flex;
            flex-direction: column;
-           align-items: flex-start;
+            align-items: flex-start;
             max-height: 100%;
-            box-sizing: border-box;
+             box-sizing: border-box;
             text-align: left;
-              box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
-        }
-         .online-users-panel .lens-effect {
-           position: absolute;
-             top: 0;
-             left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-             border-radius: 50%;
-           background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.15) 20%, transparent 60%);
-            z-index: 1;
-           opacity: 0.6;
-            pointer-events: none;
-             transform: scale(1.1);
                 box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
        }
 
-        .online-users-panel h2 {
+       .online-users-panel h2 {
             font-size: 1rem;
-             margin-bottom: 10px;
+           margin-bottom: 10px;
                text-align: center;
         }
 
         .online-users-panel ul {
-             list-style: none;
-           padding: 0;
-        }
+          list-style: none;
+            padding: 0;
+       }
 
-        .online-users-panel li {
-            margin-bottom: 5px;
+       .online-users-panel li {
+           margin-bottom: 5px;
             font-size: 0.8rem;
             padding: 5px;
-           border: 2px solid #0f0;
-             border-radius: 4px;
-               box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
-        }
+             border: 2px solid #0f0;
+           border-radius: 4px;
+                 box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+       }
         .online-users-panel li.current-user {
-          color: #000;
+           color: #000;
             background: #0f0;
-               text-shadow: none;
+            text-shadow: none;
+       }
+      #persistentChatTimer {
+           position: absolute;
+             top: 5px; /* Adjust for spacing */
+           left: 5px; /* Adjust for spacing */
+             font-size: 0.7rem;
+            color: #0f0;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 4px;
+           border-radius: 4px;
+           z-index: 4;
+          text-align: left;
+            pointer-events: none;
+      }
+        #accessCodeDisplay {
+            position: absolute;
+             top: 5px; /* Adjust for spacing */
+            right: 5px; /* Adjust for spacing */
+            font-size: 0.7rem;
+           color: #0f0;
+             background: rgba(0, 0, 0, 0.7);
+            padding: 4px;
+           border-radius: 4px;
+           z-index: 4;
+           text-align: right;
+            pointer-events: none;
+       }
+         #accessCodeInput{
+           padding: 10px;
+             font-family: "Press Start 2P", monospace;
+             font-size: 0.7rem;
+             color: #0f0;
+           background: #000;
+            border: 2px solid #0f0;
+             border-radius: 4px;
+           transition: all 0.2s ease;
+            width: calc(100% - 20px); /* Take up available space */
+          box-sizing: border-box; /* Ensure padding and border do not add to width */
+            margin-bottom: 10px;
+            outline: none;
         }
+        #accessCodeInput:focus {
+           box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+            border-color: #0f0;
+      }
+       #copyAccessCode {
+             padding: 10px 15px;
+             font-family: "Press Start 2P", monospace;
+             font-size: 0.7rem;
+           color: #0f0;
+            background: #000;
+            border: 2px solid #0f0;
+           border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+           position: relative;
+           overflow: hidden;
+             text-transform: uppercase;
+            min-width: 80px;
+            text-align: center;
+        }
+        #copyAccessCode:hover {
+            background: #0f0;
+             color: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
+       }
+
+      #copyAccessCode:active {
+            transform: translateY(2px);
+       }
+         #backToPublicChat {
+            padding: 10px 15px;
+            font-family: "Press Start 2P", monospace;
+           font-size: 0.7rem;
+             color: #0f0;
+           background: #000;
+            border: 2px solid #0f0;
+            border-radius: 4px;
+            cursor: pointer;
+           transition: all 0.2s ease;
+            position: relative;
+          overflow: hidden;
+          text-transform: uppercase;
+           min-width: 80px;
+           text-align: center;
+        }
+       #backToPublicChat:hover {
+           background: #0f0;
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
+       }
+
+       #backToPublicChat:active {
+          transform: translateY(2px);
+      }
+     //  .general-chat::before{
+     //      content:"(public)";
+     //       position: absolute;
+     //       top: 0;
+       //      left: 0;
+         //  width: 100%;
+           // height: 100%;
+    //        display: flex;
+    //         align-items: center;
+    //        justify-content: center;
+    //       font-size: 0.7rem;
+    //       color: #ff0;
+    //        text-shadow: 0 0 5px #ff0;
+       }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
     
     <div class="crt-container">
-              <div class="crt">
-                <div class="crt-lens-effect"></div>
+              <div class="crt general-chat">
+                   <div id="persistentChatTimer"></div>
+                    <div id="accessCodeDisplay"></div>
                   <div class="crt-content" id="chatMessages">
                       <!-- Messages will appear here -->
                   </div>
                  <div class="chat-input">
-                     <div class="image-upload-indicator" id="imageUploadIndicator">
-                     Image Uploaded (click here to remove)
+                      <div class="image-upload-indicator" id="imageUploadIndicator">
+                      Image Uploaded (click here to remove)
                   </div>
                     <textarea id="chatInput" placeholder="Type your message..." onkeydown="handleInput(event)"></textarea>
-                     <label for="fileInput">Upload</label>
+                    <label for="fileInput">Upload</label>
                     <input type="file" id="fileInput" accept="image/*">
                    <button onclick="sendMessage()">Send</button>
                   </div>
               </div>
       
         <div class="online-users-panel" >
-              <div class="lens-effect"></div>
             <h2>Online Users</h2>
               <ul id="onlineUsersList">
                 <!-- Online users will appear here -->
              </ul>
-        </div>
-     </div>
-    
-    <script>
+           <input type="text" id="accessCodeInput" placeholder="Enter Access Code to Join Chat" onkeydown="handleAccessCodeInput(event)"/>
+             <button onclick="createPersistentChat()">Create New Chat</button>
+            <button onclick="copyAccessCode()" id ="copyAccessCode">Copy Access Code</button>
+            <button onclick="backToPublicChat()" id ="backToPublicChat">Back To Public Chat</button>
+       </div>
+    </div>
+    i  <script>
         const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
         const ws = new WebSocket(`${wsProtocol}://${window.location.host}`);
         const userNumber = Math.floor(Math.random() * 1000);
         let replyToMessage = null;
         let imageUploadIndicatorTimeout; // Store timeout ID
+        let accessCode = null; //global access code for the current chat.
+         let timerInterval; // store timer for clearing intervals
          const emojiMap = {
             ':)': '<span class="emoji">^_^</span>',
             ':(': '<span class="emoji">o_o</span>',
-             ':D': '<span class="emoji">\\o/</span>',
-             '<3': '<span class="emoji"><3</span>',
+            ':D': '<span class="emoji">\\o/</span>',
+            '<3': '<span class="emoji"><3</span>',
             ':O': '<span class="emoji">O_O</span>',
-             ':P': '<span class="emoji">:-P</span>',
+            ':P': '<span class="emoji">:-P</span>',
              ';)': '<span class="emoji">;-)</span>',
              'XD': '<span class="emoji">XD</span>',
         };
-           let onlineUsers = {}; // Object to store online users
+          let onlineUsers = {}; // Object to store online users
 
         // Send join message when connecting
-        ws.onopen = () => {
-          //send join message with user number.
-            ws.send(JSON.stringify({
+         ws.onopen = () => {
+            //send join message with user number.
+           ws.send(JSON.stringify({
                 type: "join",
-                 user: `User${userNumber}`
-            }));
+                user: `User${userNumber}`,
+                accessCode: accessCode,
+         }));
           
-        };
-  ws.onclose = () => {
+     };
+   ws.onclose = () => {
     // Display a local message indicating the user left
     displaySystemMessage(`You (User${userNumber}) have left the chat`);
 
-     // Optionally, inform the user the connection has ended
-    const chatMessages = document.getElementById("chatMessages");
-     const warningMessage = document.createElement("div");
+    // Optionally, inform the user the connection has ended
+   const chatMessages = document.getElementById("chatMessages");
+    const warningMessage = document.createElement("div");
     warningMessage.className = "system-message";
-     warningMessage.style.color = "#f00"; // Highlight in red
-    warningMessage.textContent = "Connection closed. You are no longer in the chat.";
-    chatMessages.appendChild(warningMessage);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-};
+    warningMessage.style.color = "#f00"; // Highlight in red
+   warningMessage.textContent = "Connection closed. You are no longer in the chat.";
+   chatMessages.appendChild(warningMessage);
+   chatMessages.scrollTop = chatMessages.scrollHeight;
+   };
         window.addEventListener("beforeunload", () => {
-           ws.send(JSON.stringify({
+            ws.send(JSON.stringify({
                type: "leave",
                 user: `User${userNumber}`
-           }));
-        });
-       
-ws.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    console.log("received message", data);
+         }));
+    });
+      
+   ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+      console.log("received message", data);
 
-        if(data.type === "userList"){
+       if(data.type === "userList"){
            onlineUsers = data.users;
-            updateUserList();
+           updateUserList();
         }
-        else if (data.type === "system") {
-            displaySystemMessage(data.content);
-       }
-       else if (data.type === "ping") {
+      else if (data.type === "accessCode") {
+          accessCode = data.accessCode;
+            document.getElementById("accessCodeDisplay").textContent = `Chat Access Code: ${accessCode}`;
+            startChatTimer(accessCode);
+          if(!document.querySelector('.crt').classList.contains('general-chat')){
+             document.querySelector('.crt').classList.remove("general-chat");
+            }
+      }
+      else if (data.type === "history"){
+         data.messages.forEach(msg => displayMessage(msg.content, msg.user, msg.replyTo, msg.type === "file",data.pinged));
+        }
+      else if (data.type === "system") {
+          displaySystemMessage(data.content);
+      }
+      else if (data.type === "ping") {
            displayPingMessage(data.content, data.user);
-        }
-    
-       else {
-            displayMessage(data.content, data.user, data.replyTo, data.type === "file",data.pinged);
-        }
-    };
+       }
+ 
+      else {
+           displayMessage(data.content, data.user, data.replyTo, data.type === "file",data.pinged);
+      }
+   };
 function displayPingMessage(content,user){
-   const chatMessages = document.getElementById("chatMessages");
-    const systemMessageElement = document.createElement("div");
+    const chatMessages = document.getElementById("chatMessages");
+   const systemMessageElement = document.createElement("div");
     systemMessageElement.className = "system-message";
-     systemMessageElement.style.color = "#ff0" //highlight yellow
-        systemMessageElement.textContent = `You have been pinged by ${user}: "${content}"`;
-        chatMessages.appendChild(systemMessageElement);
-     chatMessages.scrollTop = chatMessages.scrollHeight;
+   systemMessageElement.style.color = "#ff0" //highlight yellow
+     systemMessageElement.textContent = `You have been pinged by ${user}: "${content}"`;
+    chatMessages.appendChild(systemMessageElement);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
 }
         function displayMessage(content, user = "System", replyTo = null, isFile = false, pinged = false) {
-            const chatMessages = document.getElementById("chatMessages");
+           const chatMessages = document.getElementById("chatMessages");
             const messageElement = document.createElement("div");
-            const isSelf = user === `User${userNumber}`;
+           const isSelf = user === `User${userNumber}`;
            messageElement.className = `message ${isSelf ? "self" : "other"}`;
 
-            // User metadata
+           // User metadata
             const userMeta = document.createElement("div");
             userMeta.className = "user-meta";
            userMeta.textContent = isSelf ? "You" : user;
-            
-           // Image indicator
+           
+            // Image indicator
            if(isFile){
                 const imageIndicator = document.createElement("span");
-                 imageIndicator.className = "image-indicator";
+                imageIndicator.className = "image-indicator";
                imageIndicator.textContent = "[Image]";
-              userMeta.appendChild(imageIndicator);
-            }
+                userMeta.appendChild(imageIndicator);
+          }
 
-           messageElement.appendChild(userMeta);
+          messageElement.appendChild(userMeta);
 
            const contentElement = document.createElement("div");
-             contentElement.className = `content ${pinged ? "pinged" : ""}`;
-            
-            // Reply container
+            contentElement.className = `content ${pinged ? "pinged" : ""}`;
+           
+           // Reply container
 if (replyTo) {
-    const replyContainer = document.createElement("div");
-    replyContainer.className = "reply-container";
+   const replyContainer = document.createElement("div");
+   replyContainer.className = "reply-container";
 
     // Check if the reply content is base64 (usually starts with 'data:image/')
     if (replyTo.content.startsWith("data:image/")) {
-       replyContainer.textContent = `Replying to ${replyTo.user}: [Image content]`;
+      replyContainer.textContent = `Replying to ${replyTo.user}: [Image content]`;
     } else {
-        replyContainer.textContent = `Replying to ${replyTo.user}: "${replyTo.content}"`;
-   }
+       replyContainer.textContent = `Replying to ${replyTo.user}: "${replyTo.content}"`;
+  }
 
-    messageElement.appendChild(replyContainer); // Append before the content
+   messageElement.appendChild(replyContainer); // Append before the content
 }
 
- 
+            
             // Image or text content
-          if (isFile) {
-                const img = document.createElement("img");
+           if (isFile) {
+               const img = document.createElement("img");
                img.src = content;
-              contentElement.appendChild(img);
-         } else {
-                 let processedContent = content;
-   for (const shortcode in emojiMap) {
-       if (emojiMap.hasOwnProperty(shortcode)) {
-            const regex = new RegExp(escapeRegExp(shortcode), 'g');
-            processedContent = processedContent.replace(regex, emojiMap[shortcode]);
+               contentElement.appendChild(img);
+          } else {
+              let processedContent = content;
+               for (const shortcode in emojiMap) {
+                    if (emojiMap.hasOwnProperty(shortcode)) {
+                       const regex = new RegExp(escapeRegExp(shortcode), 'g');
+                       processedContent = processedContent.replace(regex, emojiMap[shortcode]);
+                   }
+             }
+           contentElement.innerHTML = processedContent
           }
-      }
-        contentElement.innerHTML = processedContent
-            }
 
-            messageElement.appendChild(contentElement);
+           messageElement.appendChild(contentElement);
 
             // Reply Button
            const replyButton = document.createElement("button");
-             replyButton.className = "reply-button";
-           replyButton.textContent = "Reply";
-            replyButton.style.marginTop = "4px"
-           replyButton.onclick = () => {
-               replyToMessage = { user, content };
-             document.getElementById("chatInput").placeholder = `Replying to ${user}: "${content}"`;
+          replyButton.className = "reply-button";
+            replyButton.textContent = "Reply";
+           replyButton.style.marginTop = "4px"
+            replyButton.onclick = () => {
+                replyToMessage = { user, content };
+               document.getElementById("chatInput").placeholder = `Replying to ${user}: "${content}"`;
               document.getElementById("chatInput").focus();
-          };
+         };
 
-           messageElement.appendChild(replyButton);
-           chatMessages.appendChild(messageElement);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-  function escapeRegExp(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escape special characters
-   }
-       function displaySystemMessage(content) {
-            const chatMessages = document.getElementById("chatMessages");
+          messageElement.appendChild(replyButton);
+            chatMessages.appendChild(messageElement);
+           chatMessages.scrollTop = chatMessages.scrollHeight;
+       }
+ function escapeRegExp(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escape special characters
+  }
+        function displaySystemMessage(content) {
+           const chatMessages = document.getElementById("chatMessages");
             const systemMessageElement = document.createElement("div");
            systemMessageElement.className = "system-message";
-           systemMessageElement.textContent = content;
-          chatMessages.appendChild(systemMessageElement);
+            systemMessageElement.textContent = content;
+           chatMessages.appendChild(systemMessageElement);
             chatMessages.scrollTop = chatMessages.scrollHeight;
-       }
+        }
 
-      function sendMessage() {
+        function sendMessage() {
             const chatInput = document.getElementById("chatInput");
             const fileInput = document.getElementById("fileInput");
           const imageIndicator = document.getElementById("imageUploadIndicator");
-           let message = chatInput.value.trim();
-           imageIndicator.classList.remove("show"); //hide indicator on send
-            const mentionRegex = /@User\d+/g; //regex for user mentions
-          const mentions = message.match(mentionRegex); //find any mentions
-           
-            if(mentions){
-                 mentions.forEach(mentionedUser => {
-                  ws.send(JSON.stringify({ //send ping
-                         type: "ping",
-                         user: `User${userNumber}`,
+            let message = chatInput.value.trim();
+          imageIndicator.classList.remove("show"); //hide indicator on send
+           const mentionRegex = /@User\d+/g; //regex for user mentions
+            const mentions = message.match(mentionRegex); //find any mentions
+            
+           if(mentions){
+                mentions.forEach(mentionedUser => {
+                 ws.send(JSON.stringify({ //send ping
+                          type: "ping",
+                           user: `User${userNumber}`,
                            content: message,
                          recipient: mentionedUser
-                     }));
-                  });
-            }
-           for (const shortcode in emojiMap) {
-                if (emojiMap.hasOwnProperty(shortcode)) {
-                const regex = new RegExp(escapeRegExp(shortcode), 'g');
-                message = message.replace(regex, emojiMap[shortcode]);
-             }
-       }
+                   }));
+               });
+           }
+            for (const shortcode in emojiMap) {
+              if (emojiMap.hasOwnProperty(shortcode)) {
+                   const regex = new RegExp(escapeRegExp(shortcode), 'g');
+                  message = message.replace(regex, emojiMap[shortcode]);
+               }
+         }
 
-            if (message) {
-                ws.send(JSON.stringify({
-                     type: "user",
-                    user: `User${userNumber}`,
+          if (message) {
+              ws.send(JSON.stringify({
+                  type: "user",
+                   user: `User${userNumber}`,
                     content: message,
-                     pinged: !!mentions, //set pinged as true if mentions exist
-                    replyTo: replyToMessage,
-                }));
-                chatInput.value = "";
-              chatInput.placeholder = "Type your message...";
+                   pinged: !!mentions, //set pinged as true if mentions exist
+                 replyTo: replyToMessage,
+              }));
+              chatInput.value = "";
+               chatInput.placeholder = "Type your message...";
               replyToMessage = null;
-               fileInput.value = ""; //clear input when no file is uploaded
-                 return;
-            }
+                fileInput.value = ""; //clear input when no file is uploaded
+                return;
+          }
            if (fileInput.files.length > 0) {
-               const file = fileInput.files[0];
+                const file = fileInput.files[0];
                const reader = new FileReader();
 
-              reader.onload = (event) => {
-                 const img = new Image();
+                reader.onload = (event) => {
+                     const img = new Image();
                    img.src = event.target.result;
 
-                  img.onload = () => {
+                   img.onload = () => {
                        const canvas = document.createElement("canvas");
-                       const maxWidth = 300;
+                        const maxWidth = 300;
                         const scale = maxWidth / img.width;
                        canvas.width = maxWidth;
                        canvas.height = img.height * scale;
 
                         const ctx = canvas.getContext("2d");
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
                         const compressedData = canvas.toDataURL("image/jpeg", 0.8);
                         ws.send(JSON.stringify({
-                           type: "file",
-                            user: `User${userNumber}`,
-                             content: compressedData,
-                           pinged: !!mentions,
-                           replyTo: replyToMessage,
-                      }));
+                            type: "file",
+                             user: `User${userNumber}`,
+                            content: compressedData,
+                              pinged: !!mentions,
+                             replyTo: replyToMessage,
+                       }));
                        fileInput.value = "";//clear input after reading file
-                    };
-               };
+                  };
+              };
 
-              reader.readAsDataURL(file);
-            
-           }
-       }
+               reader.readAsDataURL(file);
+        
+          }
+        }
     
     //Show Image Uploaded popup
     document.getElementById("fileInput").addEventListener("change", () => {
       const imageIndicator = document.getElementById("imageUploadIndicator");
-        imageIndicator.classList.add("show");
-    
-   });
+      imageIndicator.classList.add("show");
    
-        //cancel image upload, now the popup is clickable, and this fires on click
-     document.getElementById("imageUploadIndicator").addEventListener('click', (event) => {
-       const fileInput = document.getElementById("fileInput");
-         const imageIndicator = document.getElementById("imageUploadIndicator");
-       fileInput.value = "";
+    });
+  
+       //cancel image upload, now the popup is clickable, and this fires on click
+        document.getElementById("imageUploadIndicator").addEventListener('click', (event) => {
+            const fileInput = document.getElementById("fileInput");
+           const imageIndicator = document.getElementById("imageUploadIndicator");
+         fileInput.value = "";
         imageIndicator.classList.remove("show");
-   });
-       
+    });
+      
 
-        function handleInput(event) {
+       function handleInput(event) {
             if (event.key === "Enter" && !event.shiftKey) {
-              event.preventDefault();
+                event.preventDefault();
                sendMessage();
           }
-        }
-
+       }
+        function handleAccessCodeInput(event) {
+           if (event.key === "Enter") {
+              event.preventDefault();
+              accessCode = document.getElementById("accessCodeInput").value;
+                ws.send(JSON.stringify({
+                    type: "join",
+                     user: `User${userNumber}`,
+                    accessCode: accessCode
+        }));
+         document.getElementById("accessCodeInput").value = ""; //clear input
+       }
+      }
+     function createPersistentChat(){
+        ws.send(JSON.stringify({type: "createChat"}));
+   }
+    function startChatTimer(accessCode) {
+      const timerElement = document.getElementById("persistentChatTimer");
+         clearInterval(timerInterval); // Clear any existing timer
+          timerInterval = setInterval(() => {
+            if (persistentChats[accessCode]) {
+                const timeLeft = 48 * 60 * 60 * 1000 - (Date.now() - persistentChats[accessCode].createdAt);
+                if (timeLeft <= 0) {
+                     clearInterval(timerInterval);
+                      timerElement.textContent = ""; //remove text, or you could add a message saying its expired.
+                    return;
+               }
+             const hours = Math.floor((timeLeft / (1000 * 60 * 60)) % 24);
+                const minutes = Math.floor((timeLeft / (1000 * 60)) % 60);
+              const seconds = Math.floor((timeLeft / 1000) % 60);
+              timerElement.textContent = `Time Left: ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+           }
+        }, 1000);
+  }
         function updateUserList() {
             const onlineUsersList = document.getElementById('onlineUsersList');
             onlineUsersList.innerHTML = ''; // Clear existing list
 
-            for (const user in onlineUsers) {
-                 if (onlineUsers.hasOwnProperty(user)) {
-                   const li = document.createElement('li');
+           for (const user in onlineUsers) {
+                if (onlineUsers.hasOwnProperty(user)) {
+                  const li = document.createElement('li');
                      li.textContent = user;
                    if(user === `User${userNumber}`){
-                       li.classList.add("current-user");
-                   }
-                   onlineUsersList.appendChild(li);
-               }
-            }
+                      li.classList.add("current-user");
+                  }
+                  onlineUsersList.appendChild(li);
+              }
          }
-
-       
+     }
+     function copyAccessCode() {
+         const accessCodeDisplay = document.getElementById('accessCodeDisplay');
+            const accessCodeText = accessCodeDisplay.textContent.split(": ")[1];
+             if(accessCodeText){
+                navigator.clipboard.writeText(accessCodeText)
+                  .then(() => {
+                      displaySystemMessage("Access Code copied to clipboard")
+                   })
+         .catch(() => {
+                   displaySystemMessage("Error Copying Access Code");
+             });
+          }
+      }
+       function backToPublicChat() {
+           accessCode = null
+        if(!document.querySelector('.crt').classList.contains('general-chat')){
+            document.querySelector('.crt').classList.add("general-chat");
+        }
+              ws.send(JSON.stringify({
+                type: "join",
+                   user: `User${userNumber}`,
+                      accessCode: accessCode
+         }));
+          document.getElementById("accessCodeDisplay").textContent = "";
+         document.getElementById("persistentChatTimer").textContent = "";
+          clearInterval(timerInterval); // Clear timer, if any
+     }
     </script>
 </body>
 </html>

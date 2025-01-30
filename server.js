@@ -2,6 +2,7 @@ const express = require("express");
 const http = require("http");
 const WebSocket = require("ws");
 const path = require("path");
+const { v4: uuidv4 } = require('uuid'); // For generating unique IDs
 
 const app = express();
 const server = http.createServer(app);
@@ -22,78 +23,130 @@ app.get("/chat", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "chat.html"));
 });
 
-// Store connected users
+// Store connected users and chats
 let onlineUsers = {};
+let persistentChats = {};
 
 // WebSocket server logic
 wss.on("connection", (ws) => {
     console.log("A new client connected!");
 
     // Function to broadcast updated user list
-    const broadcastUserList = () => {
+    const broadcastUserList = (chatId) => {
         wss.clients.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN) {
-                client.send(JSON.stringify({ type: "userList", users: onlineUsers }));
+           if (client.chatId === chatId && client.readyState === WebSocket.OPEN) {
+                 client.send(JSON.stringify({ type: "userList", users: Object.fromEntries(Object.entries(onlineUsers).filter(([key,value]) => value === chatId)) }));
             }
-        });
+       });
     };
 
     // Function to find a user's websocket
-    const findUserWebsocket = (user) => {
+    const findUserWebsocket = (user, chatId) => {
         for (const client of wss.clients) {
-             if (client.user === user) {
-                 return client;
-            }
+           if (client.user === user && client.chatId === chatId) {
+               return client;
+           }
         }
-        return null;
+       return null;
     };
+ // Function to broadcast message history
+    const broadcastMessageHistory = (ws, chatId) => {
+    if (persistentChats[chatId] && persistentChats[chatId].messages) {
+            ws.send(JSON.stringify({
+            type: "history",
+               messages: persistentChats[chatId].messages,
+             }));
+          }
+        };
 
-    ws.on("message", (message) => {
+  const cleanupChat = (chatId) => {
+     if(persistentChats[chatId]){
+         console.log(`Deleting chat room ${chatId}`);
+         delete persistentChats[chatId];
+         wss.clients.forEach(client => {
+              if(client.chatId === chatId){
+                  client.send(JSON.stringify({
+                      type: "system",
+                      content: "This persistent chat has been deleted due to inactivity or age."
+                 }));
+                   client.chatId = null;
+              }
+           })
+     }
+ };
+
+  ws.on("message", (message) => {
         try {
             const parsedMessage = JSON.parse(message);
             console.log("Server Received:", parsedMessage);
 
+             if (parsedMessage.type === "createChat") {
+                const accessCode = uuidv4(); // Generate access code
+                persistentChats[accessCode] = {
+                    messages: [],
+                    createdAt: Date.now(),
+                       timer: setTimeout(() => cleanupChat(accessCode), 48 * 60 * 60 * 1000) // wipe chat after 48 hours
+                };
+                    ws.send(JSON.stringify({ type: "accessCode", accessCode: accessCode })); // send code to client to display
+               console.log(`Chat Room Created ${accessCode}`);
+               return;
+             }
             if (parsedMessage.type === "join") {
-                onlineUsers[parsedMessage.user] = true;
-                ws.user = parsedMessage.user;
+               const { user, accessCode } = parsedMessage;
+              ws.user = user; // Store user in websocket object
+                 if (accessCode && persistentChats[accessCode]) {
+                     ws.chatId = accessCode;
+                      onlineUsers[parsedMessage.user] = accessCode
+                   broadcastMessageHistory(ws, accessCode);
+                   broadcastUserList(accessCode);
+                       console.log(`${parsedMessage.user} joined persistent chat ${accessCode}`)
+                 }
+                else{
+                     ws.chatId = "general";
+                      onlineUsers[parsedMessage.user] = "general"
+                       broadcastUserList("general");
+                      console.log(`${parsedMessage.user} joined general chat`);
+                 }
+                // Broadcast join message to all clients in the chat
                 wss.clients.forEach((client) => {
-                    if (client.readyState === WebSocket.OPEN) {
-                        client.send(JSON.stringify({
-                            type: "system",
-                            content: `${parsedMessage.user} has joined the chat`,
-                        }));
-                    }
+                  if(client.chatId === ws.chatId && client.readyState === WebSocket.OPEN){
+                    client.send(JSON.stringify({
+                        type: "system",
+                         content: `${parsedMessage.user} has joined the chat`,
+                   }));
+                   }
                 });
-                broadcastUserList();
-                console.log(`${parsedMessage.user} joined`);
+
                 return;
             }
-            if (parsedMessage.type === "leave") {
-                delete onlineUsers[parsedMessage.user];
-                wss.clients.forEach((client) => {
-                    if (client.readyState === WebSocket.OPEN) {
-                        client.send(JSON.stringify({
-                            type: "system",
-                            content: `${parsedMessage.user} has left the chat`,
-                        }));
-                    }
-                });
-                broadcastUserList();
-                console.log(`${parsedMessage.user} left`);
-                return;
-            }
-            if (parsedMessage.type === "file") {
-                const base64Regex = /^data:image\/(jpeg|png|gif);base64,/;
-                if (!base64Regex.test(parsedMessage.content)) {
-                    ws.send(JSON.stringify({ type: "system", content: "Error: Invalid file format. Only JPEG, PNG, and GIF are allowed." }));
-                    return;
+              if (parsedMessage.type === "leave") {
+                  delete onlineUsers[parsedMessage.user];
+                  // Broadcast leave message to all clients
+                  wss.clients.forEach((client) => {
+                      if (client.chatId === ws.chatId && client.readyState === WebSocket.OPEN) {
+                          client.send(JSON.stringify({
+                              type: "system",
+                             content: `${parsedMessage.user} has left the chat`,
+                          }));
+                      }
+                   });
+                     broadcastUserList(ws.chatId);
+                      console.log(`${parsedMessage.user} left`);
+                      return;
+              }
+           // Handle image uploads
+           if (parsedMessage.type === "file") {
+               const base64Regex = /^data:image\/(jpeg|png|gif);base64,/; // Validate JPEG, PNG, GIF
+               if (!base64Regex.test(parsedMessage.content)) {
+                 ws.send(JSON.stringify({ type: "system", content: "Error: Invalid file format. Only JPEG, PNG, and GIF are allowed." }));
+                  return;
                 }
-            }
-            if (parsedMessage.type === "ping") {
+           }
+             if (parsedMessage.type === "ping") {
                   const recipientUser = parsedMessage.recipient.startsWith("@") ? parsedMessage.recipient.slice(1) : parsedMessage.recipient;
-                 const recipient = findUserWebsocket(recipientUser);
-                    if(recipient && recipient.readyState === WebSocket.OPEN){
-                      console.log("Server Sending Ping to:", recipientUser, parsedMessage);
+                    const recipient = findUserWebsocket(recipientUser,ws.chatId);
+                   if(recipient && recipient.readyState === WebSocket.OPEN){
+                    console.log("Server Sending Ping to:", recipientUser, parsedMessage);
                       recipient.send(JSON.stringify({ //send the ping to the mentioned user only.
                            type: "ping",
                            user: parsedMessage.user,
@@ -101,15 +154,19 @@ wss.on("connection", (ws) => {
                          }));
                         return;
                    }
-                  console.log("Ping recipient not found or not open:", recipientUser);
+                    console.log("Ping recipient not found or not open:", recipientUser);
                     return;
              }
-             // Broadcast messages to all connected clients
-              wss.clients.forEach((client) => {
-               if (client.readyState === WebSocket.OPEN && parsedMessage.type !== "join" && parsedMessage.type !== "leave" && parsedMessage.type !== "ping") {
-                   client.send(JSON.stringify(parsedMessage));
-                }
-          });
+             // Handle user messages for persistent chats
+           if (parsedMessage.type === "user" && ws.chatId && persistentChats[ws.chatId]) {
+                persistentChats[ws.chatId].messages.push(parsedMessage);
+             }
+           // Broadcast messages to all connected clients
+          wss.clients.forEach((client) => {
+               if (client.readyState === WebSocket.OPEN && client.chatId === ws.chatId && parsedMessage.type !== "join" && parsedMessage.type !== "leave" && parsedMessage.type !== "ping") {
+                 client.send(JSON.stringify(parsedMessage));
+               }
+            });
         } catch (error) {
             console.error("Failed to process message:", error);
             ws.send(JSON.stringify({ type: "system", content: "Error: Invalid message format." }));
@@ -117,40 +174,48 @@ wss.on("connection", (ws) => {
     });
 
    ws.on("close", () => {
-          // Find the user that disconnected and remove it.
-       let disconnectedUser;
-        for (const user in onlineUsers) {
+        // Find the user that disconnected and remove it.
+         let disconnectedUser;
+       for (const user in onlineUsers) {
         if (onlineUsers.hasOwnProperty(user)) {
-          if(onlineUsers[user] === true){
+          if(onlineUsers[user] === ws.chatId){
               wss.clients.forEach(client =>{
-              if(client === ws){
-                    disconnectedUser = user;
-                    console.log(`Detected: ${user} disconnected`);
-                    return;
-                }
+               if(client === ws){
+                   disconnectedUser = user;
+                 console.log(`Detected: ${user} disconnected from ${ws.chatId}`);
+                   return;
+                 }
            })
           }
        }
      }
-        if(disconnectedUser){
-              delete onlineUsers[disconnectedUser];
-                  wss.clients.forEach((client) => {
-                    if (client.readyState === WebSocket.OPEN) {
-                        client.send(JSON.stringify({
-                            type: "system",
-                            content: `${disconnectedUser} has left the chat`,
-                        }));
+       if(disconnectedUser){
+                delete onlineUsers[disconnectedUser];
+                 // Broadcast leave message to all clients
+                wss.clients.forEach((client) => {
+                    if (client.chatId === ws.chatId && client.readyState === WebSocket.OPEN) {
+                         client.send(JSON.stringify({
+                             type: "system",
+                           content: `${disconnectedUser} has left the chat`,
+                       }));
                     }
-                });
-               broadcastUserList();
+               });
+              broadcastUserList(ws.chatId);
         }
-          console.log("A client disconnected.");
-    });
+        
+       console.log("A client disconnected.");
+   });
 
-    ws.on("error", (error) => {
+   ws.on("error", (error) => {
         console.error("WebSocket error:", error);
-    });
-    broadcastUserList();
+  });
+   
+    if(ws.chatId){
+        broadcastUserList(ws.chatId)
+   }
+    else{
+         broadcastUserList("general");
+   }
 });
 
 // Start the server
